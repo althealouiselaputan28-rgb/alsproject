@@ -120,8 +120,35 @@
                             </div>
                         </div>
 
-                        <div id="rosterList" class="roster-grid row g-3 mt-3">
-                            <!-- roster items will be rendered here -->
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-6">
+                                <div class="roster-section p-3 rounded">
+                                    <div class="section-header d-flex align-items-center justify-content-between mb-3">
+                                        <div>
+                                            <h3 class="text-white h5 mb-1">Section Alcala</h3>
+                                        </div>
+                                        <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="alcala">Add to Alcala</button>
+                                    </div>
+                                    <div class="section-default-image text-center mb-3">
+                                        <img src="images/alslogo.png" alt="Section Alcala default image" class="img-fluid rounded shadow-sm" />
+                                    </div>
+                                    <div id="rosterAlcala" class="row g-3"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="roster-section p-3 rounded">
+                                    <div class="section-header d-flex align-items-center justify-content-between mb-3">
+                                        <div>
+                                            <h3 class="text-white h5 mb-1">Section Cabrera</h3>
+                                        </div>
+                                        <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="cabrera">Add to Cabrera</button>
+                                    </div>
+                                    <div class="section-default-image text-center mb-3">
+                                        <img src="images/tntslogo.png" alt="Section Cabrera default image" class="img-fluid rounded shadow-sm" />
+                                    </div>
+                                    <div id="rosterCabrera" class="row g-3"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,7 +168,7 @@
                         <label for="postTitle" class="form-label">Post Title</label>
                         <input type="text" id="postTitle" class="form-control bg-secondary text-white border-0" placeholder="Enter title here">
                     </div>
-                    <div id="editor-container" class="bg-white rounded" style="min-height: 220px;"></div>
+                    <div id="editor-container" class="bg-secondary rounded text-white" style="min-height: 220px;"></div>
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

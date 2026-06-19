@@ -65,6 +65,10 @@
     } catch (e) {
         console.warn('Quill not available or editor not on page.', e);
     }
+    // editing state
+    let editingArticleId = null;
+    let editingRosterId = null;
+    let editingRosterImageUrl = '';
 
     // DOM handles
     const authBtn = document.getElementById('authBtn');
@@ -170,6 +174,16 @@
         });
     }
 
+    // Ensure create post clears edit state before showing modal
+    if (createPostBtn) {
+        createPostBtn.addEventListener('click', () => {
+            editingArticleId = null;
+            if (postTitleInput) postTitleInput.value = '';
+            if (quill) quill.setText('');
+            publishPostBtn.textContent = 'Publish Post';
+        });
+    }
+
     if (supabase && supabase.auth && typeof supabase.auth.onAuthStateChange === 'function') {
         supabase.auth.onAuthStateChange((event, session) => {
             console.log('Auth state change:', event, session);
@@ -230,14 +244,58 @@
                 });
 
                 const newArticle = document.createElement('article');
-                newArticle.className = 'card custom-card mb-4';
-                newArticle.innerHTML = `
-                    <div class="card-body p-4">
-                        <h3 class="card-title h4 text-white fw-bold">${article.title}</h3>
-                        <p class="text-secondary small">Published on: ${dateStr}</p>
-                        <div class="card-text text-light">${article.content}</div>
-                    </div>
-                `;
+                newArticle.className = 'card custom-card mb-4 article-card';
+                const body = document.createElement('div');
+                body.className = 'card-body p-4 position-relative';
+                const editBtn = document.createElement('button');
+                editBtn.type = 'button';
+                editBtn.className = 'btn btn-sm btn-outline-secondary edit-article-btn d-none';
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', () => {
+                    editingArticleId = article.id;
+                    if (postTitleInput) postTitleInput.value = article.title || '';
+                    if (quill) quill.root.innerHTML = article.content || '';
+                    if (bootstrapModal) bootstrapModal.show();
+                    publishPostBtn.textContent = 'Update Post';
+                });
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'btn btn-sm btn-outline-danger delete-article-btn d-none ms-2';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', async () => {
+                    if (!confirm('Delete this article? This cannot be undone.')) return;
+                    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                    if (sessionError || !session) {
+                        alert('You must be signed in to delete.');
+                        return;
+                    }
+                    const res = await supabase.from('articles').delete().eq('id', article.id);
+                    if (res.error) {
+                        alert(`Delete failed: ${res.error.message}`);
+                    } else {
+                        await fetchArticles();
+                    }
+                });
+
+                const titleEl = document.createElement('h3');
+                titleEl.className = 'card-title h4 text-white fw-bold';
+                titleEl.textContent = article.title;
+
+                const meta = document.createElement('p');
+                meta.className = 'text-secondary small';
+                meta.textContent = `Published on: ${dateStr}`;
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'card-text text-light';
+                contentDiv.innerHTML = article.content;
+
+                body.appendChild(editBtn);
+                body.appendChild(deleteBtn);
+                body.appendChild(titleEl);
+                body.appendChild(meta);
+                body.appendChild(contentDiv);
+                newArticle.appendChild(body);
 
                 articleFeed.appendChild(newArticle);
             });
@@ -274,9 +332,19 @@
             publishPostBtn.disabled = true;
             publishPostBtn.textContent = 'Transmitting...';
 
-            const { error } = await supabase
-                .from('articles')
-                .insert([{ title, content: contentHTML, created_by: session.user.id }]);
+            let error = null;
+            if (editingArticleId) {
+                const res = await supabase
+                    .from('articles')
+                    .update({ title, content: contentHTML })
+                    .eq('id', editingArticleId);
+                error = res.error;
+            } else {
+                const res = await supabase
+                    .from('articles')
+                    .insert([{ title, content: contentHTML, created_by: session.user.id }]);
+                error = res.error;
+            }
 
             if (error) {
                 alert(`Transmission Error encountered: ${error.message}`);
@@ -285,6 +353,8 @@
                 if (quill) quill.setText('');
                 if (bootstrapModal) bootstrapModal.hide();
                 await fetchArticles();
+                editingArticleId = null;
+                publishPostBtn.textContent = 'Publish Post';
             }
 
             publishPostBtn.disabled = false;
@@ -299,33 +369,75 @@
 
     // Roster: fetch and display
     async function fetchRoster() {
-            const rosterList = document.getElementById('rosterList');
-            if (!rosterList) return;
+            const rosterAlcala = document.getElementById('rosterAlcala');
+            const rosterCabrera = document.getElementById('rosterCabrera');
+            if (!rosterAlcala || !rosterCabrera) return;
 
-            rosterList.innerHTML = '';
+            rosterAlcala.innerHTML = '';
+            rosterCabrera.innerHTML = '';
 
             if (!supabase) {
-                rosterList.innerHTML = '<div class="col-12 text-secondary">Roster unavailable in offline mode.</div>';
+                rosterAlcala.innerHTML = '<div class="col-12 text-secondary">Roster unavailable in offline mode.</div>';
+                rosterCabrera.innerHTML = '<div class="col-12 text-secondary">Roster unavailable in offline mode.</div>';
                 return;
             }
 
             try {
                 const { data, error } = await supabase.from('roster').select('*').order('created_at', { ascending: false });
                 if (error) {
-                    rosterList.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
+                    rosterAlcala.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
+                    rosterCabrera.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
                     return;
                 }
 
                 if (!data || data.length === 0) {
-                    rosterList.innerHTML = '<div class="col-12 text-secondary">No roster entries yet.</div>';
+                    rosterAlcala.innerHTML = '<div class="col-12 text-secondary">No roster entries yet.</div>';
+                    rosterCabrera.innerHTML = '<div class="col-12 text-secondary">No roster entries yet.</div>';
                     return;
                 }
 
                 data.forEach(item => {
                     const col = document.createElement('div');
-                    col.className = 'col-md-4 col-sm-6';
+                    col.className = 'col-6 col-md-4 col-lg-3';
                     const card = document.createElement('div');
                     card.className = 'p-3 rounded roster-card text-center';
+                    // roster edit button
+                    const rosterEditBtn = document.createElement('button');
+                    rosterEditBtn.type = 'button';
+                    rosterEditBtn.className = 'btn btn-sm btn-outline-secondary edit-roster-btn d-none';
+                    rosterEditBtn.textContent = 'Edit';
+                    rosterEditBtn.addEventListener('click', () => {
+                        editingRosterId = item.id;
+                        editingRosterImageUrl = item.image_url || '';
+                        const nameInput = document.getElementById('studentName');
+                        const subtitleInput = document.getElementById('studentSubtitle');
+                        if (nameInput) nameInput.value = item.name || '';
+                        if (subtitleInput) subtitleInput.value = item.subtitle || '';
+                        const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
+                        modal.show();
+                    });
+
+                    const rosterDeleteBtn = document.createElement('button');
+                    rosterDeleteBtn.type = 'button';
+                    rosterDeleteBtn.className = 'btn btn-sm btn-outline-danger delete-roster-btn d-none ms-2';
+                    rosterDeleteBtn.textContent = 'Delete';
+                    rosterDeleteBtn.addEventListener('click', async () => {
+                        if (!confirm('Delete this roster entry? This cannot be undone.')) return;
+                        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                        if (sessionError || !session) {
+                            alert('You must be signed in to delete.');
+                            return;
+                        }
+                        const res = await supabase.from('roster').delete().eq('id', item.id);
+                        if (res.error) {
+                            alert(`Delete failed: ${res.error.message}`);
+                        } else {
+                            await fetchRoster();
+                        }
+                    });
+                    // place edit button in card
+                    card.appendChild(rosterEditBtn);
+                    card.appendChild(rosterDeleteBtn);
                     const img = document.createElement('img');
                     img.src = item.image_url || '';
                     img.alt = item.name || '';
@@ -345,14 +457,36 @@
                         subtitleEl.textContent = subtitle;
                         card.appendChild(subtitleEl);
                     }
+
+                    const lowerSubtitle = subtitle.toLowerCase();
+                    const isCabrera = lowerSubtitle.includes('cabrera');
+                    const targetSection = isCabrera ? rosterCabrera : rosterAlcala;
+
                     col.appendChild(card);
-                    rosterList.appendChild(col);
+                    targetSection.appendChild(col);
                 });
             } catch (e) {
-                rosterList.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
+                rosterAlcala.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
+                rosterCabrera.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
                 console.error(e);
             }
         }
+
+        // Hook section-specific add buttons
+        const sectionAddBtns = document.querySelectorAll('.section-add-btn');
+        sectionAddBtns.forEach(button => {
+            button.addEventListener('click', () => {
+                editingRosterId = null;
+                editingRosterImageUrl = '';
+                const section = button.dataset.section;
+                const nameInput = document.getElementById('studentName');
+                const subtitleInput = document.getElementById('studentSubtitle');
+                if (nameInput) nameInput.value = '';
+                if (subtitleInput) subtitleInput.value = section === 'cabrera' ? 'Section Cabrera' : 'Section Alcala';
+                const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
+                modal.show();
+            });
+        });
 
         // Hook Add Student form
         const addStudentForm = document.getElementById('addStudentForm');
@@ -371,14 +505,14 @@
                     const file = fileInput.files[0];
                     const name = nameInput.value.trim();
                     const subtitle = subtitleInput.value.trim();
-                if (!name || !file) {
+                if (!name || (!file && !editingRosterId)) {
                     alert('Please provide a name and photo.');
                     return;
                 }
 
-                const safeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
-                const filename = `roster/${Date.now()}_${safeFileName}`;
-                console.log('Uploading file path', filename, 'bucket roster-photos');
+                const safeFileName = file ? file.name.replace(/[^a-zA-Z0-9_.-]/g, '_') : '';
+                const filename = file ? `roster/${Date.now()}_${safeFileName}` : '';
+                console.log('Uploading file path', filename || '(no new file)', 'bucket roster-photos');
                 try {
                     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                     console.log('Upload session', session, sessionError);
@@ -386,34 +520,48 @@
                         throw new Error('Admin session not found.');
                     }
 
-                    const { data: uploadData, error: uploadError } = await supabase.storage.from('roster-photos').upload(filename, file, { cacheControl: '3600', upsert: false });
-                    console.log('Storage upload result', uploadData, uploadError);
-                    if (uploadError) {
-                        console.error('Storage upload error details', uploadError);
-                        throw uploadError;
-                    }
+                    let imageUrl = editingRosterImageUrl || '';
 
-                    const { data: publicUrlData, error: publicUrlError } = supabase.storage.from('roster-photos').getPublicUrl(filename);
-                    if (publicUrlError) {
-                        console.error('Public URL error', publicUrlError);
-                        throw publicUrlError;
+                    // If a new file was chosen, upload it; otherwise reuse existing image URL for edits
+                    if (file) {
+                        const { data: uploadData, error: uploadError } = await supabase.storage.from('roster-photos').upload(filename, file, { cacheControl: '3600', upsert: false });
+                        console.log('Storage upload result', uploadData, uploadError);
+                        if (uploadError) {
+                            console.error('Storage upload error details', uploadError);
+                            throw uploadError;
+                        }
+
+                        const { data: publicUrlData, error: publicUrlError } = supabase.storage.from('roster-photos').getPublicUrl(filename);
+                        if (publicUrlError) {
+                            console.error('Public URL error', publicUrlError);
+                            throw publicUrlError;
+                        }
+                        imageUrl = publicUrlData.publicUrl;
                     }
-                    const imageUrl = publicUrlData.publicUrl;
 
                     const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
                     const normalizedSubtitle = subtitle.toLowerCase() === 'none' ? '' : subtitle;
                     if (normalizedSubtitle) {
                         rosterRow.subtitle = normalizedSubtitle;
                     }
-                    const { error: dbError } = await supabase.from('roster').insert([rosterRow]);
-                    if (dbError) throw dbError;
+
+                    // If editing, update the existing row; otherwise insert
+                    let dbRes;
+                    if (editingRosterId) {
+                        dbRes = await supabase.from('roster').update(rosterRow).eq('id', editingRosterId);
+                    } else {
+                        dbRes = await supabase.from('roster').insert([rosterRow]);
+                    }
+                    if (dbRes.error) throw dbRes.error;
 
                     // clear and close modal
                     nameInput.value = '';
-                    fileInput.value = '';
+                    if (fileInput) fileInput.value = '';
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
                     if (modal) modal.hide();
                     await fetchRoster();
+                    editingRosterId = null;
+                    editingRosterImageUrl = '';
                 } catch (err) {
                     if (err && err.status) {
                         console.error('Upload failed with status', err.status, err.message, err);
@@ -447,9 +595,20 @@
                 if (session) {
                     if (addBtn) addBtn.classList.remove('d-none');
                     if (createBtn) createBtn.classList.remove('d-none');
+                        // reveal section add buttons, edit and delete buttons
+                        document.querySelectorAll('.section-add-btn').forEach(b => b.classList.remove('d-none'));
+                        document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.remove('d-none'));
+                        document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.remove('d-none'));
+                        document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.remove('d-none'));
+                        document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.remove('d-none'));
                 } else {
                     if (addBtn) addBtn.classList.add('d-none');
                     if (createBtn) createBtn.classList.add('d-none');
+                        document.querySelectorAll('.section-add-btn').forEach(b => b.classList.add('d-none'));
+                        document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.add('d-none'));
+                        document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.add('d-none'));
+                        document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.add('d-none'));
+                        document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.add('d-none'));
                 }
             } catch (e) {
                 console.warn('Failed to check session', e);

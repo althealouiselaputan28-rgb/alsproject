@@ -100,12 +100,59 @@ body {
     color: #adb5bd;
 }
 
+/* Edit buttons */
+.edit-article-btn, .edit-roster-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+}
+
+.roster-card { position: relative; }
+.article-card { position: relative; }
+
 .page-section.active-section {
     display: block;
 }
 
 .page-section .card.custom-card {
     min-height: 220px;
+}
+
+.roster-section {
+    background-color: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 193, 7, 0.18);
+    min-height: 320px;
+}
+
+.section-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.section-header .section-add-btn {
+    margin-top: 0.75rem;
+}
+
+.section-default-image img {
+    border: none;
+    max-height: 160px;
+    width: 100%;
+    object-fit: cover;
+    display: inline-block;
+}
+
+.roster-section h3 {
+    margin-bottom: 0;
+}
+
+.roster-section p {
+    margin-bottom: 0;
+    color: #adb5bd;
 }
 
 .roster-item {
@@ -134,4 +181,10 @@ body {
 .card-text img {
     max-width: 100%;
     height: auto;
+}
+
+/* Quill editor gray background to match request */
+#editor-container .ql-editor {
+    background-color: #6c757d !important;
+    color: #fff !important;
 }
