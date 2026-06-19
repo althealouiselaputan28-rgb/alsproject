@@ -71,6 +71,35 @@ body {
     display: none;
 }
 
+.roster-card {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.roster-card:hover {
+    transform: translateY(-3px);
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.roster-photo {
+    border: none;
+    max-height: 160px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.roster-name {
+    margin-top: 0.75rem;
+    font-size: 1rem;
+}
+
+.roster-subtitle {
+    margin-top: 0.25rem;
+    font-size: 0.88rem;
+    color: #adb5bd;
+}
+
 .page-section.active-section {
     display: block;
 }

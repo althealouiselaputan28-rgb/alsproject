@@ -325,19 +325,26 @@
                     const col = document.createElement('div');
                     col.className = 'col-md-4 col-sm-6';
                     const card = document.createElement('div');
-                    card.className = 'p-3 rounded bg-dark border border-secondary text-center';
+                    card.className = 'p-3 rounded roster-card text-center';
                     const img = document.createElement('img');
                     img.src = item.image_url || '';
                     img.alt = item.name || '';
                     img.style.maxWidth = '100%';
-                    img.style.height = '180px';
+                    img.style.height = '170px';
                     img.style.objectFit = 'cover';
-                    img.className = 'mb-2 rounded';
+                    img.className = 'mb-2 rounded roster-photo';
                     const name = document.createElement('div');
-                    name.className = 'text-white fw-bold';
+                    name.className = 'text-white fw-bold roster-name';
                     name.textContent = item.name || 'Unnamed';
                     card.appendChild(img);
                     card.appendChild(name);
+                    const subtitle = (item.subtitle || '').toString().trim();
+                    if (subtitle && subtitle.toLowerCase() !== 'none') {
+                        const subtitleEl = document.createElement('div');
+                        subtitleEl.className = 'text-secondary roster-subtitle';
+                        subtitleEl.textContent = subtitle;
+                        card.appendChild(subtitleEl);
+                    }
                     col.appendChild(card);
                     rosterList.appendChild(col);
                 });
@@ -359,10 +366,11 @@
                 }
 
                 const nameInput = document.getElementById('studentName');
-                const fileInput = document.getElementById('studentPhoto');
-                const file = fileInput.files[0];
-                const name = nameInput.value.trim();
-
+                    const subtitleInput = document.getElementById('studentSubtitle');
+                    const fileInput = document.getElementById('studentPhoto');
+                    const file = fileInput.files[0];
+                    const name = nameInput.value.trim();
+                    const subtitle = subtitleInput.value.trim();
                 if (!name || !file) {
                     alert('Please provide a name and photo.');
                     return;
@@ -392,7 +400,12 @@
                     }
                     const imageUrl = publicUrlData.publicUrl;
 
-                    const { error: dbError } = await supabase.from('roster').insert([{ name, image_url: imageUrl, created_by: session.user.id }]);
+                    const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
+                    const normalizedSubtitle = subtitle.toLowerCase() === 'none' ? '' : subtitle;
+                    if (normalizedSubtitle) {
+                        rosterRow.subtitle = normalizedSubtitle;
+                    }
+                    const { error: dbError } = await supabase.from('roster').insert([rosterRow]);
                     if (dbError) throw dbError;
 
                     // clear and close modal
