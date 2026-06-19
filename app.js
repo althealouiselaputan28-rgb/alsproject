@@ -361,18 +361,29 @@
                     return;
                 }
 
-                const filename = `roster/${Date.now()}_${file.name}`;
+                const safeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
+                const filename = `roster/${Date.now()}_${safeFileName}`;
+                console.log('Uploading file path', filename, 'bucket roster-photos');
                 try {
-                    const { data: uploadData, error: uploadError } = await supabase.storage.from('roster-photos').upload(filename, file, { cacheControl: '3600', upsert: false });
-                    if (uploadError) throw uploadError;
-
-                    const { data: publicUrlData } = supabase.storage.from('roster-photos').getPublicUrl(filename);
-                    const imageUrl = publicUrlData.publicUrl;
-
                     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                    console.log('Upload session', session, sessionError);
                     if (sessionError || !session) {
                         throw new Error('Admin session not found.');
                     }
+
+                    const { data: uploadData, error: uploadError } = await supabase.storage.from('roster-photos').upload(filename, file, { cacheControl: '3600', upsert: false });
+                    console.log('Storage upload result', uploadData, uploadError);
+                    if (uploadError) {
+                        console.error('Storage upload error details', uploadError);
+                        throw uploadError;
+                    }
+
+                    const { data: publicUrlData, error: publicUrlError } = supabase.storage.from('roster-photos').getPublicUrl(filename);
+                    if (publicUrlError) {
+                        console.error('Public URL error', publicUrlError);
+                        throw publicUrlError;
+                    }
+                    const imageUrl = publicUrlData.publicUrl;
 
                     const { error: dbError } = await supabase.from('roster').insert([{ name, image_url: imageUrl, created_by: session.user.id }]);
                     if (dbError) throw dbError;
@@ -384,7 +395,11 @@
                     if (modal) modal.hide();
                     await fetchRoster();
                 } catch (err) {
-                    console.error('Upload error', err);
+                    if (err && err.status) {
+                        console.error('Upload failed with status', err.status, err.message, err);
+                    } else {
+                        console.error('Upload error', err);
+                    }
                     alert('Upload failed. See console for details.');
                 }
             });
