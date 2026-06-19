@@ -16,9 +16,13 @@
     }
 
     // CDN/global fallback: if the UMD script is included and global variables are provided
+    let activeSupabaseUrl = null;
+    let activeSupabaseKey = null;
     if (!supabase) {
         const SUPABASE_URL = window.SUPABASE_URL || (import.meta && import.meta.env && import.meta.env.VITE_SUPABASE_URL);
         const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || (import.meta && import.meta.env && import.meta.env.VITE_SUPABASE_ANON_KEY);
+        activeSupabaseUrl = SUPABASE_URL;
+        activeSupabaseKey = SUPABASE_ANON_KEY;
         if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -26,10 +30,15 @@
             } catch (e) {
                 console.warn('CDN/global Supabase initialization failed.', e);
             }
-        } else if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-            console.warn('Supabase config not provided (VITE env or window globals). Running in offline mode.');
         }
     }
+
+    console.group('Supabase debug');
+    console.log('Supabase available:', !!supabase);
+    if (supabase) {
+        console.log('Active Supabase URL:', activeSupabaseUrl || (import.meta && import.meta.env && import.meta.env.VITE_SUPABASE_URL));
+    }
+    console.groupEnd();
 
     // Initialize Quill (script included in index.html)
     let quill = null;
@@ -86,6 +95,36 @@
         if (updateHash) window.location.hash = `#${pageKey}`;
     }
 
+    function updateAuthButton(session) {
+        if (!authBtn) return;
+        if (session && session.user) {
+            authBtn.textContent = 'Logout';
+            authBtn.classList.replace('btn-outline-danger', 'btn-danger');
+            if (createPostBtn) createPostBtn.classList.remove('d-none');
+        } else {
+            authBtn.textContent = 'Login';
+            authBtn.classList.replace('btn-danger', 'btn-outline-danger');
+            if (createPostBtn) createPostBtn.classList.add('d-none');
+        }
+    }
+
+    async function checkSessionState() {
+        if (!supabase) {
+            updateAuthButton(null);
+            return null;
+        }
+
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+            console.error('Session retrieval error', error);
+            updateAuthButton(null);
+            return null;
+        }
+
+        updateAuthButton(data.session);
+        return data.session;
+    }
+
     // Auth button behavior (guarded)
     if (authBtn) {
         authBtn.addEventListener('click', async () => {
@@ -94,19 +133,40 @@
                 return;
             }
 
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError) {
+                console.error('Session check error', sessionError);
+            }
+
             if (session) {
                 await supabase.auth.signOut();
+                updateAuthButton(null);
                 window.location.reload();
-            } else {
-                const email = prompt('Enter Administration Identity Domain Email:');
-                const password = prompt('Enter Password Credential Key Sequence:');
-                if (email && password) {
-                    const { error } = await supabase.auth.signInWithPassword({ email, password });
-                    if (error) alert(`Access Rejected: ${error.message}`);
-                    else window.location.reload();
-                }
+                return;
             }
+
+            const email = prompt('Enter Administration Identity Domain Email:');
+            const password = prompt('Enter Password Credential Key Sequence:');
+            if (!email || !password) {
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            console.log('SignIn response', data, error);
+            if (error) {
+                alert(`Access Rejected: ${error.message}`);
+                return;
+            }
+
+            await checkSessionState();
+            window.location.reload();
+        });
+    }
+
+    if (supabase && supabase.auth && typeof supabase.auth.onAuthStateChange === 'function') {
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state change:', event, session);
+            updateAuthButton(session);
         });
     }
 
@@ -188,6 +248,14 @@
                 return;
             }
 
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) {
+                alert('You must be signed in to publish.');
+                publishPostBtn.disabled = false;
+                publishPostBtn.textContent = 'Publish Post';
+                return;
+            }
+
             const title = (postTitleInput && postTitleInput.value) ? postTitleInput.value.trim() : '';
             const contentHTML = quill ? quill.root.innerHTML : '';
 
@@ -201,7 +269,7 @@
 
             const { error } = await supabase
                 .from('articles')
-                .insert([{ title, content: contentHTML }]);
+                .insert([{ title, content: contentHTML, created_by: session.user.id }]);
 
             if (error) {
                 alert(`Transmission Error encountered: ${error.message}`);
@@ -219,10 +287,11 @@
 
     // Initial run
     fetchArticles();
-        fetchArticles();
+    await checkSessionState();
+    await fetchRoster();
 
-        // Roster: fetch and display
-        async function fetchRoster() {
+    // Roster: fetch and display
+    async function fetchRoster() {
             const rosterList = document.getElementById('rosterList');
             if (!rosterList) return;
 
@@ -300,7 +369,12 @@
                     const { data: publicUrlData } = supabase.storage.from('roster-photos').getPublicUrl(filename);
                     const imageUrl = publicUrlData.publicUrl;
 
-                    const { error: dbError } = await supabase.from('roster').insert([{ name, image_url: imageUrl }]);
+                    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                    if (sessionError || !session) {
+                        throw new Error('Admin session not found.');
+                    }
+
+                    const { error: dbError } = await supabase.from('roster').insert([{ name, image_url: imageUrl, created_by: session.user.id }]);
                     if (dbError) throw dbError;
 
                     // clear and close modal
