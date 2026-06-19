@@ -1,0 +1,96 @@
+/* Color System Theme Specifications */
+body {
+    background-color: #050914; 
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #f8f9fa;
+}
+
+/* Typography Utilities */
+.tracking-wide { letter-spacing: 0.05em; }
+.tracking-widest { letter-spacing: 0.15em; }
+.small-meta { font-size: 0.65rem; font-weight: 800; }
+.fw-black { font-weight: 900; }
+
+/* Custom Navigation Header Elements */
+.nav-custom-link {
+    color: #a0aec0 !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+.nav-custom-link:hover, .nav-custom-link.active {
+    color: #ffc107 !important;
+    background-color: rgba(255, 193, 7, 0.08);
+    outline: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.brand-text-alternative {
+    color: #ff3b3b;
+    margin-right: 0.4rem;
+}
+.brand-text-learning {
+    color: #28a745;
+    margin-right: 0.4rem;
+}
+.brand-text-system {
+    color: #3b82f6;
+}
+
+/* Hero UI Block Wrapper */
+.hero-banner {
+    background-color: #0a1128;
+    background-image: radial-gradient(circle at top right, rgba(255, 193, 7, 0.03), transparent);
+}
+
+.hero-image-box {
+    background: transparent;
+    border: none;
+    width: auto;
+    max-width: none;
+    min-height: auto;
+    gap: 1rem;
+}
+
+.hero-box-logo {
+    max-height: 150px;
+    width: auto;
+    background: transparent;
+    border: none;
+}
+
+/* Core Dashboard Container Structures */
+.custom-card {
+    background-color: #0a1128;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.roster-item {
+    background-color: #050914;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s;
+}
+.roster-item:hover {
+    background-color: #0d1735;
+}
+
+/* Rich Text Editor Mobile Component Tweaks */
+#editor-container {
+    height: 250px;
+    border-color: #6c757d !important;
+}
+.ql-toolbar.ql-snow {
+    background-color: #212529;
+    border-color: #6c757d !important;
+}
+.ql-snow .ql-stroke { stroke: #fff !important; }
+.ql-snow .ql-fill { fill: #fff !important; }
+.ql-snow .ql-picker { color: #fff !important; }
+
+/* Ensure internal user-uploaded post images scale smoothly on small displays */
+.card-text img {
+    max-width: 100%;
+    height: auto;
+}
