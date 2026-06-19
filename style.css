@@ -101,11 +101,22 @@ body {
 }
 
 /* Edit buttons */
-.edit-article-btn, .edit-roster-btn {
+.edit-article-btn, .edit-roster-btn, .delete-roster-btn {
+    z-index: 5;
+}
+
+.roster-action-wrap {
     position: absolute;
     top: 8px;
     right: 8px;
-    z-index: 5;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.roster-action-wrap .btn {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.75rem;
 }
 
 .roster-card { position: relative; }

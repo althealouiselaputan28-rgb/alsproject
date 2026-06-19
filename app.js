@@ -419,7 +419,7 @@
 
                     const rosterDeleteBtn = document.createElement('button');
                     rosterDeleteBtn.type = 'button';
-                    rosterDeleteBtn.className = 'btn btn-sm btn-outline-danger delete-roster-btn d-none ms-2';
+                    rosterDeleteBtn.className = 'btn btn-sm btn-outline-danger delete-roster-btn d-none';
                     rosterDeleteBtn.textContent = 'Delete';
                     rosterDeleteBtn.addEventListener('click', async () => {
                         if (!confirm('Delete this roster entry? This cannot be undone.')) return;
@@ -435,9 +435,11 @@
                             await fetchRoster();
                         }
                     });
-                    // place edit button in card
-                    card.appendChild(rosterEditBtn);
-                    card.appendChild(rosterDeleteBtn);
+                    const rosterActionWrap = document.createElement('div');
+                    rosterActionWrap.className = 'roster-action-wrap';
+                    rosterActionWrap.appendChild(rosterEditBtn);
+                    rosterActionWrap.appendChild(rosterDeleteBtn);
+                    card.appendChild(rosterActionWrap);
                     const img = document.createElement('img');
                     img.src = item.image_url || '';
                     img.alt = item.name || '';
