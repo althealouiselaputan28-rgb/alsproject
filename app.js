@@ -397,10 +397,14 @@
                 } catch (err) {
                     if (err && err.status) {
                         console.error('Upload failed with status', err.status, err.message, err);
+                        console.log('message:', err.message);
+                        console.log('status:', err.status);
+                        console.log('name:', err.name);
+                        console.log('error json:', JSON.stringify(err, null, 2));
                     } else {
                         console.error('Upload error', err);
                     }
-                    alert('Upload failed. See console for details.');
+                    alert(err?.message || 'Upload failed');
                 }
             });
         }
