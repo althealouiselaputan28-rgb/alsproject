@@ -24,9 +24,9 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav gap-2 mt-3 mt-lg-0 align-items-lg-center">
-                    <li class="nav-item"><a class="nav-link nav-custom-link active" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link nav-custom-link" href="#">Information</a></li>
-                    <li class="nav-item"><a class="nav-link nav-custom-link" href="#">Roster</a></li>
+                    <li class="nav-item"><a class="nav-link nav-custom-link active" href="#home" data-page="home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link nav-custom-link" href="#information" data-page="information">Information</a></li>
+                    <li class="nav-item"><a class="nav-link nav-custom-link" href="#roster" data-page="roster">Roster</a></li>
                     <li class="nav-item ms-lg-2">
                         <button class="btn btn-outline-danger btn-sm px-3 fw-semibold text-uppercase" id="authBtn">Login</button>
                     </li>
@@ -53,40 +53,80 @@
             </div>
         </header>
 
-        <div class="row g-4">
-            <main class="col-lg-8">
-                <div class="d-flex justify-content-between align-items-baseline mb-2">
-                    <div>
-                        <h2 class="text-white text-uppercase tracking-wide fw-bold mb-0">Latest News</h2>
-                        <span class="text-warning text-uppercase tracking-widest small-meta">Breaking Updates</span>
+        <section id="homePage" class="page-section active-section">
+            <div class="row g-4">
+                <main class="col-lg-8">
+                    <div class="d-flex justify-content-between align-items-baseline mb-2">
+                        <div>
+                            <h2 class="text-white text-uppercase tracking-wide fw-bold mb-0">Latest News</h2>
+                            <span class="text-warning text-uppercase tracking-widest small-meta">Breaking Updates</span>
+                        </div>
+                        <button class="btn btn-warning btn-sm d-none fw-bold text-uppercase" id="createPostBtn" data-bs-toggle="modal" data-bs-target="#editorModal">
+                            Create Post
+                        </button>
                     </div>
-                    <button class="btn btn-warning btn-sm d-none fw-bold text-uppercase" id="createPostBtn" data-bs-toggle="modal" data-bs-target="#editorModal">
-                        Create Post
-                    </button>
-                </div>
-                <hr class="border-warning border-2 opacity-100 mt-1 mb-4">
-                
-                <div id="articleFeed">
-                    <div class="text-center text-secondary py-5" id="feedLoader">Connecting to network secure servers...</div>
-                </div>
-            </main>
+                    <hr class="border-warning border-2 opacity-100 mt-1 mb-4">
+                    
+                    <div id="articleFeed">
+                        <div class="text-center text-secondary py-5" id="feedLoader">Connecting to network secure servers...</div>
+                    </div>
+                </main>
 
-            <aside class="col-lg-4">
-                <div class="card custom-card border-danger-subtle h-100">
-                    <div class="card-body p-4">
-                        <h2 class="h5 text-danger text-uppercase tracking-wide fw-bold mb-4">Quick Access</h2>
-                        <div class="d-flex flex-column gap-3" id="rosterGrid">
-                            <div class="roster-item p-3 rounded d-flex align-items-center justify-content-between">
-                                <span class="text-white small fw-bold tracking-wide">📄 ACTIVE ROSTER</span>
-                            </div>
-                            <div class="roster-item p-3 rounded d-flex align-items-center justify-content-between">
-                                <span class="text-white small fw-bold tracking-wide">ℹ️ BUREAU INFORMATION</span>
+                <aside class="col-lg-4">
+                    <div class="card custom-card border-danger-subtle h-100">
+                        <div class="card-body p-4">
+                            <h2 class="h5 text-danger text-uppercase tracking-wide fw-bold mb-4">Quick Access</h2>
+                            <div class="d-flex flex-column gap-3" id="rosterGrid">
+                                <div class="roster-item p-3 rounded d-flex align-items-center justify-content-between">
+                                    <span class="text-white small fw-bold tracking-wide">📄 ACTIVE ROSTER</span>
+                                </div>
+                                <div class="roster-item p-3 rounded d-flex align-items-center justify-content-between">
+                                    <span class="text-white small fw-bold tracking-wide">ℹ️ BUREAU INFORMATION</span>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="informationPage" class="page-section">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card custom-card border-danger-subtle p-4">
+                        <h2 class="text-white text-uppercase tracking-wide fw-bold mb-3">Information</h2>
+                        <p class="text-secondary">This page contains details about the Alternative Learning System, campus updates, and school news.</p>
+                        <ul class="list-group list-group-flush bg-transparent">
+                            <li class="list-group-item bg-transparent border-secondary text-white">Mission: Provide quality alternative education for all students.</li>
+                            <li class="list-group-item bg-transparent border-secondary text-white">Vision: Empower learners with skills for life and career success.</li>
+                            <li class="list-group-item bg-transparent border-secondary text-white">Departments: Academic, Technical-Vocational, Guidance, and Student Services.</li>
+                        </ul>
+                    </div>
                 </div>
-            </aside>
-        </div>
+            </div>
+        </section>
+
+        <section id="rosterPage" class="page-section">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card custom-card border-danger-subtle p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h2 class="text-white text-uppercase tracking-wide fw-bold mb-0">Roster</h2>
+                                <p class="text-secondary mb-0">Yearbook-style student roster with photos.</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-warning d-none" id="addStudentBtn" data-bs-toggle="modal" data-bs-target="#addStudentModal">Add Student</button>
+                            </div>
+                        </div>
+
+                        <div id="rosterList" class="roster-grid row g-3 mt-3">
+                            <!-- roster items will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <div class="modal fade" id="editorModal" tabindex="-1" aria-hidden="true">
@@ -113,6 +153,33 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.min.js"></script>
+    <!-- Optional: Supabase CDN so uploads can work on plain static pages if you don't bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+
+    <!-- Add Student Modal -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white text-uppercase">Add Student</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addStudentForm" class="modal-body text-white p-4">
+                    <div class="mb-3">
+                        <label for="studentName" class="form-label">Student Name</label>
+                        <input id="studentName" class="form-control bg-secondary text-white border-0" placeholder="Full name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="studentPhoto" class="form-label">Photo</label>
+                        <input id="studentPhoto" type="file" accept="image/*" class="form-control bg-secondary text-white border-0">
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-warning" id="uploadStudentBtn">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script type="module" src="/app.js"></script>
 </body>
 </html>
