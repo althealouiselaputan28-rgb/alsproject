@@ -37,6 +37,13 @@
     console.log('Supabase available:', !!supabase);
     if (supabase) {
         console.log('Active Supabase URL:', activeSupabaseUrl || (import.meta && import.meta.env && import.meta.env.VITE_SUPABASE_URL));
+        window.supabaseClient = supabase;
+        window.supabaseInstance = supabase;
+        window.$supabase = supabase;
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+            window.supabase = supabase;
+        }
+        console.log('Use supabaseClient.auth.getSession() or supabase.auth.getSession() if available.');
     }
     console.groupEnd();
 
