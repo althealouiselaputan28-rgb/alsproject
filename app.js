@@ -428,7 +428,7 @@
             }
 
             try {
-                const { data, error } = await supabase.from('roster').select('*').order('created_at', { ascending: false });
+                const { data, error } = await supabase.from('roster').select('*').order('created_at', { ascending: true });
                 if (error) {
                     rosterAlcala.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
                     rosterCabrera.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
