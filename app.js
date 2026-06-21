@@ -76,6 +76,8 @@
     const createPostBtn = document.getElementById('createPostBtn');
     const publishPostBtn = document.getElementById('publishPostBtn');
     const postTitleInput = document.getElementById('postTitle');
+    const postAuthorInput = document.getElementById('postAuthor');
+    const postImageUrlInput = document.getElementById('postImageUrl');
     const articleFeed = document.getElementById('articleFeed');
     const feedLoader = document.getElementById('feedLoader');
     const navbarLinks = document.querySelectorAll('[data-page]');
@@ -342,6 +344,8 @@
                 editBtn.addEventListener('click', () => {
                     editingArticleId = article.id;
                     if (postTitleInput) postTitleInput.value = article.title || '';
+                    if (postAuthorInput) postAuthorInput.value = article.author || '';
+                    if (postImageUrlInput) postImageUrlInput.value = article.image_url || article.thumbnail_url || '';
                     if (quill) quill.root.innerHTML = article.content || '';
                     if (bootstrapModal) bootstrapModal.show();
                     publishPostBtn.textContent = 'Update Post';
@@ -370,6 +374,18 @@
                 titleEl.className = 'card-title h4 text-white fw-bold';
                 titleEl.textContent = article.title;
 
+                const thumbnail = document.createElement('img');
+                thumbnail.className = 'card-img-top article-thumb rounded mb-3';
+                thumbnail.src = article.image_url || article.thumbnail_url || 'images/default-article.png';
+                thumbnail.alt = article.title ? `${article.title} thumbnail` : 'Article thumbnail';
+                thumbnail.onerror = () => {
+                    thumbnail.src = 'images/default-article.png';
+                };
+
+                const authorMeta = document.createElement('p');
+                authorMeta.className = 'text-secondary small mb-3 author-line d-flex align-items-center gap-2';
+                authorMeta.innerHTML = `<img src="images/author-icon.svg" alt="Author icon" class="author-icon"> ${article.author || 'Unknown author'}`;
+
                 const meta = document.createElement('p');
                 meta.className = 'text-secondary small';
                 meta.textContent = `Published on: ${dateStr}`;
@@ -393,8 +409,10 @@
 
                 body.appendChild(editBtn);
                 body.appendChild(deleteBtn);
+                body.appendChild(thumbnail);
                 body.appendChild(titleEl);
                 body.appendChild(meta);
+                body.appendChild(authorMeta);
                 body.appendChild(excerptDiv);
                 actionWrap.appendChild(readBtn);
                 body.appendChild(actionWrap);
@@ -426,6 +444,8 @@
             }
 
             const title = (postTitleInput && postTitleInput.value) ? postTitleInput.value.trim() : '';
+            const author = (postAuthorInput && postAuthorInput.value) ? postAuthorInput.value.trim() : '';
+            const imageUrl = (postImageUrlInput && postImageUrlInput.value) ? postImageUrlInput.value.trim() : '';
             const contentHTML = quill ? quill.root.innerHTML : '';
 
             if (!title || contentHTML === '<p><br></p>' || !contentHTML) {
@@ -440,13 +460,13 @@
             if (editingArticleId) {
                 const res = await supabase
                     .from('articles')
-                    .update({ title, content: contentHTML })
+                    .update({ title, content: contentHTML, author, image_url: imageUrl })
                     .eq('id', editingArticleId);
                 error = res.error;
             } else {
                 const res = await supabase
                     .from('articles')
-                    .insert([{ title, content: contentHTML, created_by: session.user.id }]);
+                    .insert([{ title, content: contentHTML, author, image_url: imageUrl, created_by: session.user.id }]);
                 error = res.error;
             }
 
@@ -454,6 +474,8 @@
                 alert(`Transmission Error encountered: ${error.message}`);
             } else {
                 if (postTitleInput) postTitleInput.value = '';
+                if (postAuthorInput) postAuthorInput.value = '';
+                if (postImageUrlInput) postImageUrlInput.value = '';
                 if (quill) quill.setText('');
                 if (bootstrapModal) bootstrapModal.hide();
                 await fetchArticles();

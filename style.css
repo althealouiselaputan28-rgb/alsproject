@@ -143,6 +143,21 @@ body {
     min-height: 5.6rem;
 }
 
+.article-thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.author-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.author-line {
+    color: #cbd5e1;
+}
+
 .page-section.active-section {
     display: block;
 }
