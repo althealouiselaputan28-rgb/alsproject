@@ -617,6 +617,7 @@
                     if (modal) modal.hide();
                     if (rosterSectionInput) rosterSectionInput.value = '';
                     await fetchRoster();
+                    updateAuthUI();
                     editingRosterId = null;
                     editingRosterImageUrl = '';
                 } catch (err) {
