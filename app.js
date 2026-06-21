@@ -91,6 +91,7 @@
     const loginEmailInput = document.getElementById('loginEmail');
     const loginPasswordInput = document.getElementById('loginPassword');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    const rosterSectionInput = document.getElementById('rosterSection');
     try {
         bootstrapModal = new bootstrap.Modal(document.getElementById('editorModal'));
     } catch (e) {
@@ -442,7 +443,7 @@
 
                 data.forEach(item => {
                     const col = document.createElement('div');
-                    col.className = 'col-6 col-md-4 col-lg-3';
+                    col.className = 'col-12 col-md-6 col-lg-4';
                     const card = document.createElement('div');
                     card.className = 'p-3 rounded roster-card text-center';
                     // roster edit button
@@ -527,6 +528,7 @@
                 const section = button.dataset.section;
                 const nameInput = document.getElementById('studentName');
                 const subtitleInput = document.getElementById('studentSubtitle');
+                if (rosterSectionInput) rosterSectionInput.value = section || '';
                 if (nameInput) nameInput.value = '';
                 if (subtitleInput) subtitleInput.value = section === 'cabrera' ? 'Section Cabrera' : 'Section Alcala';
                 const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
@@ -537,6 +539,11 @@
         // Hook Add Student form
         const addStudentForm = document.getElementById('addStudentForm');
         const addStudentBtn = document.getElementById('addStudentBtn');
+        if (addStudentBtn) {
+            addStudentBtn.addEventListener('click', () => {
+                if (rosterSectionInput) rosterSectionInput.value = '';
+            });
+        }
         if (addStudentForm) {
             addStudentForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -587,8 +594,11 @@
 
                     const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
                     const normalizedSubtitle = subtitle.toLowerCase() === 'none' ? '' : subtitle;
+                    const selectedSection = rosterSectionInput?.value;
                     if (normalizedSubtitle) {
                         rosterRow.subtitle = normalizedSubtitle;
+                    } else if (selectedSection) {
+                        rosterRow.subtitle = selectedSection === 'cabrera' ? 'Section Cabrera' : 'Section Alcala';
                     }
 
                     // If editing, update the existing row; otherwise insert
@@ -605,6 +615,7 @@
                     if (fileInput) fileInput.value = '';
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
                     if (modal) modal.hide();
+                    if (rosterSectionInput) rosterSectionInput.value = '';
                     await fetchRoster();
                     editingRosterId = null;
                     editingRosterImageUrl = '';
