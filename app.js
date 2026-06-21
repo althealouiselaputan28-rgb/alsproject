@@ -102,6 +102,18 @@
         roster: document.getElementById('rosterPage')
     };
 
+    function stripHtml(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html || '', 'text/html');
+        return doc.body.textContent || '';
+    }
+
+    function getExcerpt(html, maxLength = 180) {
+        const text = stripHtml(html).trim().replace(/\s+/g, ' ');
+        if (!text) return '';
+        return text.length <= maxLength ? text : `${text.slice(0, maxLength).trim()}...`;
+    }
+
     // safe modal init
     let bootstrapModal = null;
     let loginBootstrapModal = null;
@@ -110,6 +122,9 @@
     const loginPasswordInput = document.getElementById('loginPassword');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     const rosterSectionInput = document.getElementById('rosterSection');
+    const viewArticleTitle = document.getElementById('viewArticleTitle');
+    const viewArticleDate = document.getElementById('viewArticleDate');
+    const viewArticleContent = document.getElementById('viewArticleContent');
     try {
         bootstrapModal = new bootstrap.Modal(document.getElementById('editorModal'));
     } catch (e) {
@@ -119,6 +134,14 @@
         loginBootstrapModal = new bootstrap.Modal(document.getElementById('loginModal'));
     } catch (e) {
         console.warn('Login modal not available.', e);
+    }
+
+    let viewArticleBootstrapModal = null;
+    try {
+        const viewArticleModalEl = document.getElementById('viewArticleModal');
+        if (viewArticleModalEl) viewArticleBootstrapModal = new bootstrap.Modal(viewArticleModalEl);
+    } catch (e) {
+        console.warn('View article modal not available.', e);
     }
 
     function activatePage(pageKey, updateHash = true) {
@@ -306,10 +329,12 @@
                     year: 'numeric', month: 'long', day: 'numeric'
                 });
 
+                const articleCol = document.createElement('div');
+                articleCol.className = 'col';
                 const newArticle = document.createElement('article');
-                newArticle.className = 'card custom-card mb-4 article-card';
+                newArticle.className = 'card custom-card h-100 article-card';
                 const body = document.createElement('div');
-                body.className = 'card-body p-4 position-relative';
+                body.className = 'card-body p-4 position-relative d-flex flex-column';
                 const editBtn = document.createElement('button');
                 editBtn.type = 'button';
                 editBtn.className = 'btn btn-sm btn-outline-secondary edit-article-btn d-none';
@@ -349,18 +374,34 @@
                 meta.className = 'text-secondary small';
                 meta.textContent = `Published on: ${dateStr}`;
 
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'card-text text-light';
-                contentDiv.innerHTML = article.content;
+                const excerptDiv = document.createElement('p');
+                excerptDiv.className = 'card-text text-light article-excerpt mb-4';
+                excerptDiv.textContent = getExcerpt(article.content, 180);
+
+                const actionWrap = document.createElement('div');
+                actionWrap.className = 'mt-auto';
+                const readBtn = document.createElement('button');
+                readBtn.type = 'button';
+                readBtn.className = 'btn btn-sm btn-warning';
+                readBtn.textContent = 'Read Article';
+                readBtn.addEventListener('click', () => {
+                    if (viewArticleTitle) viewArticleTitle.textContent = article.title;
+                    if (viewArticleDate) viewArticleDate.textContent = dateStr;
+                    if (viewArticleContent) viewArticleContent.innerHTML = article.content || '<p>No content available.</p>';
+                    if (viewArticleBootstrapModal) viewArticleBootstrapModal.show();
+                });
 
                 body.appendChild(editBtn);
                 body.appendChild(deleteBtn);
                 body.appendChild(titleEl);
                 body.appendChild(meta);
-                body.appendChild(contentDiv);
+                body.appendChild(excerptDiv);
+                actionWrap.appendChild(readBtn);
+                body.appendChild(actionWrap);
                 newArticle.appendChild(body);
+                articleCol.appendChild(newArticle);
 
-                articleFeed.appendChild(newArticle);
+                if (articleFeed) articleFeed.appendChild(articleCol);
             });
         } catch (e) {
             console.error('Error fetching articles', e);

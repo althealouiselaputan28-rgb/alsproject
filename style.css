@@ -129,7 +129,19 @@ body {
 }
 
 .roster-card { position: relative; }
-.article-card { position: relative; }
+.article-card {
+    position: relative;
+    border-radius: 1rem;
+}
+
+#articleFeed {
+    margin-top: 1rem;
+}
+
+.article-excerpt {
+    color: #cbd5e1;
+    min-height: 5.6rem;
+}
 
 .page-section.active-section {
     display: block;

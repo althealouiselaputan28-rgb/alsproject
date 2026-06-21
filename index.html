@@ -67,8 +67,8 @@
                     </div>
                     <hr class="border-warning border-2 opacity-100 mt-1 mb-4">
                     
-                    <div id="articleFeed">
-                        <div class="text-center text-secondary py-5" id="feedLoader">Connecting to network secure servers...</div>
+                    <div id="articleFeed" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                        <div class="col-12 text-center text-secondary py-5" id="feedLoader">Connecting to network secure servers...</div>
                     </div>
                 </main>
 
@@ -188,6 +188,24 @@
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-warning" id="publishPostBtn">Publish Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewArticleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-dark border border-secondary">
+                <div class="modal-header border-secondary">
+                    <div>
+                        <h5 id="viewArticleTitle" class="modal-title text-white text-uppercase tracking-wide">Article Title</h5>
+                        <p id="viewArticleDate" class="text-secondary small mb-0"></p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-dark text-white" id="viewArticleContent"></div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
