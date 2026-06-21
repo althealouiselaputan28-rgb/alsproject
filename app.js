@@ -128,6 +128,7 @@
     const viewArticleTitle = document.getElementById('viewArticleTitle');
     const viewArticleDate = document.getElementById('viewArticleDate');
     const viewArticleContent = document.getElementById('viewArticleContent');
+    const viewArticleImage = document.getElementById('viewArticleImage');
     try {
         bootstrapModal = new bootstrap.Modal(document.getElementById('editorModal'));
     } catch (e) {
@@ -405,6 +406,15 @@ let thumbnail = null;
                 readBtn.addEventListener('click', () => {
                     if (viewArticleTitle) viewArticleTitle.textContent = article.title;
                     if (viewArticleDate) viewArticleDate.textContent = dateStr;
+                    if (viewArticleImage) {
+                        const articleImageUrl = article.image_url || article.thumbnail_url || '';
+                        if (articleImageUrl) {
+                            viewArticleImage.src = articleImageUrl;
+                            viewArticleImage.classList.remove('d-none');
+                        } else {
+                            viewArticleImage.classList.add('d-none');
+                        }
+                    }
                     if (viewArticleContent) viewArticleContent.innerHTML = article.content || '<p>No content available.</p>';
                     if (viewArticleBootstrapModal) viewArticleBootstrapModal.show();
                 });
