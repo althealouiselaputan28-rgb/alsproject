@@ -374,17 +374,18 @@
                 titleEl.className = 'card-title h4 text-white fw-bold';
                 titleEl.textContent = article.title;
 
-                const thumbnail = document.createElement('img');
-                thumbnail.className = 'card-img-top article-thumb rounded mb-3';
-                thumbnail.src = article.image_url || article.thumbnail_url || 'images/default-article.png';
-                thumbnail.alt = article.title ? `${article.title} thumbnail` : 'Article thumbnail';
-                thumbnail.onerror = () => {
-                    thumbnail.src = 'images/default-article.png';
-                };
-
+let thumbnail = null;
+                const imageUrl = article.image_url || article.thumbnail_url;
+                if (imageUrl) {
+                    thumbnail = document.createElement('img');
+                    thumbnail.className = 'card-img-top article-thumb rounded mb-3';
+                    thumbnail.src = imageUrl;
+                    thumbnail.alt = article.title ? `${article.title} thumbnail` : 'Article thumbnail';
+                }
+ 
                 const authorMeta = document.createElement('p');
                 authorMeta.className = 'text-secondary small mb-3 author-line d-flex align-items-center gap-2';
-                authorMeta.innerHTML = `<img src="images/pen-nib-solid-full.svg" alt="Author icon" class="author-icon"> ${article.author || 'Unknown author'}`;
+                authorMeta.innerHTML = `<img src="images/pen-nib-solid.png" alt="Author icon" class="author-icon"> ${article.author || 'Unknown author'}`;
 
                 const meta = document.createElement('p');
                 meta.className = 'text-secondary small';
@@ -409,7 +410,7 @@
 
                 body.appendChild(editBtn);
                 body.appendChild(deleteBtn);
-                body.appendChild(thumbnail);
+                if (thumbnail) body.appendChild(thumbnail);
                 body.appendChild(titleEl);
                 body.appendChild(meta);
                 body.appendChild(authorMeta);
