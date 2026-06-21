@@ -81,6 +81,7 @@
     const articleFeed = document.getElementById('articleFeed');
     const feedLoader = document.getElementById('feedLoader');
     const navbarLinks = document.querySelectorAll('[data-page]');
+    const authorIconUrl = new URL('./images/pen-nib-solid.png', import.meta.url).href;
 
     const SECTION_MARKER = '||SECTION:';
     function parseRosterSubtitle(rawSubtitle) {
@@ -385,7 +386,7 @@ let thumbnail = null;
  
                 const authorMeta = document.createElement('p');
                 authorMeta.className = 'text-secondary small mb-3 author-line d-flex align-items-center gap-2';
-                authorMeta.innerHTML = `<img src="images/pen-nib-solid.png" alt="Author icon" class="author-icon"> ${article.author || 'Unknown author'}`;
+                authorMeta.innerHTML = `<img src="${authorIconUrl}" alt="Author icon" class="author-icon"> ${article.author || 'Unknown author'}`;
 
                 const meta = document.createElement('p');
                 meta.className = 'text-secondary small';
