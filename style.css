@@ -132,6 +132,12 @@ body {
 .article-card {
     position: relative;
     border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.18);
+    border-color: rgba(255, 193, 7, 0.25);
 }
 
 #articleFeed {
