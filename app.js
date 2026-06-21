@@ -79,7 +79,6 @@
     const articleFeed = document.getElementById('articleFeed');
     const feedLoader = document.getElementById('feedLoader');
     const navbarLinks = document.querySelectorAll('[data-page]');
-    const rosterSectionInput = document.getElementById('rosterSection');
 
     const SECTION_MARKER = '||SECTION:';
     function parseRosterSubtitle(rawSubtitle) {
