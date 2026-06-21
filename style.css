@@ -153,12 +153,22 @@ body {
     margin-top: 0.75rem;
 }
 
+.section-default-image {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+}
+
 .section-default-image img {
     border: none;
-    max-height: 160px;
+    height: 260px;
     width: 100%;
     object-fit: cover;
-    display: inline-block;
+    display: block;
+}
+
+.roster-card {
+    min-height: 380px;
 }
 
 .roster-section h3 {
