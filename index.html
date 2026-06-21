@@ -78,10 +78,10 @@
                             <h2 class="h5 text-danger text-uppercase tracking-wide fw-bold mb-4">Quick Access</h2>
                             <div class="d-flex flex-column gap-3" id="rosterGrid">
                                 <div class="roster-item p-3 rounded d-flex align-items-center justify-content-between">
-                                    <span class="text-white small fw-bold tracking-wide">📄 INFORMATION</span>
+                                    <span class="text-white small fw-bold tracking-wide">📄 ACTIVE ROSTER</span>
                                 </div>
                                 <div class="roster-item p-3 rounded d-flex align-items-center justify-content-between">
-                                    <span class="text-white small fw-bold tracking-wide">ℹ️ ROSTER</span>
+                                    <span class="text-white small fw-bold tracking-wide">ℹ️ BUREAU INFORMATION</span>
                                 </div>
                             </div>
                         </div>
@@ -182,6 +182,31 @@
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.min.js"></script>
     <!-- Optional: Supabase CDN so uploads can work on plain static pages if you don't bundle -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white text-uppercase tracking-wide">Admin Login</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="loginForm" class="modal-body text-white p-4">
+                    <div class="mb-3">
+                        <label for="loginEmail" class="form-label">Email</label>
+                        <input id="loginEmail" type="email" class="form-control login-input" placeholder="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input id="loginPassword" type="password" class="form-control login-input" placeholder="password" required>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-warning" id="loginSubmitBtn">Sign In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Add Student Modal -->
     <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">

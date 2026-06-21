@@ -199,3 +199,41 @@ body {
     background-color: #6c757d !important;
     color: #fff !important;
 }
+/* Login page styles */
+.login-page {
+    background: radial-gradient(circle at top, rgba(255, 193, 7, 0.12), transparent 25%),
+                linear-gradient(180deg, #070a1a 0%, #03050f 100%);
+}
+
+.login-card {
+    max-width: 420px;
+    width: 100%;
+    background: rgba(9, 16, 44, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.login-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(255, 193, 7, 0.16);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.login-input {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.login-input:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.18);
+}
+
+.login-form a {
+    color: #ffc107;
+}

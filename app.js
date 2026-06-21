@@ -86,10 +86,20 @@
 
     // safe modal init
     let bootstrapModal = null;
+    let loginBootstrapModal = null;
+    const loginForm = document.getElementById('loginForm');
+    const loginEmailInput = document.getElementById('loginEmail');
+    const loginPasswordInput = document.getElementById('loginPassword');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     try {
         bootstrapModal = new bootstrap.Modal(document.getElementById('editorModal'));
     } catch (e) {
         console.warn('Bootstrap modal not available.', e);
+    }
+    try {
+        loginBootstrapModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    } catch (e) {
+        console.warn('Login modal not available.', e);
     }
 
     function activatePage(pageKey, updateHash = true) {
@@ -152,25 +162,59 @@
             if (session) {
                 await supabase.auth.signOut();
                 updateAuthButton(null);
-                window.location.reload();
+                updateAuthUI();
                 return;
             }
 
-            const email = prompt('Enter Administration Identity Domain Email:');
-            const password = prompt('Enter Password Credential Key Sequence:');
-            if (!email || !password) {
+            if (loginBootstrapModal) {
+                loginBootstrapModal.show();
+            }
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!supabase) {
+                alert('Authentication is unavailable on this static server.');
                 return;
+            }
+
+            const email = loginEmailInput?.value.trim();
+            const password = loginPasswordInput?.value;
+            if (!email || !password) {
+                alert('Please enter both email and password.');
+                return;
+            }
+
+            if (loginSubmitBtn) {
+                loginSubmitBtn.disabled = true;
+                loginSubmitBtn.textContent = 'Signing In...';
             }
 
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             console.log('SignIn response', data, error);
+
             if (error) {
                 alert(`Access Rejected: ${error.message}`);
+                if (loginSubmitBtn) {
+                    loginSubmitBtn.disabled = false;
+                    loginSubmitBtn.textContent = 'Sign In';
+                }
                 return;
             }
 
             await checkSessionState();
-            window.location.reload();
+            updateAuthUI();
+            if (loginBootstrapModal) {
+                loginBootstrapModal.hide();
+            }
+            if (loginEmailInput) loginEmailInput.value = '';
+            if (loginPasswordInput) loginPasswordInput.value = '';
+            if (loginSubmitBtn) {
+                loginSubmitBtn.disabled = false;
+                loginSubmitBtn.textContent = 'Sign In';
+            }
         });
     }
 
