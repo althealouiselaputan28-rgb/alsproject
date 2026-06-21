@@ -1,8 +1,12 @@
 /* Color System Theme Specifications */
 body {
-    background-color: #050914; 
+    background-color: #ffffff;
     font-family: system-ui, -apple-system, sans-serif;
-    color: #f8f9fa;
+    color: #111111;
+}
+
+.navbar {
+    background-color: #050914;
 }
 
 /* Typography Utilities */
@@ -87,6 +91,7 @@ body {
     max-height: 260px;
     width: 100%;
     object-fit: cover;
+    border-radius: 1rem;
 }
 
 .roster-card {
@@ -165,6 +170,7 @@ body {
     width: 100%;
     object-fit: cover;
     display: block;
+    border-radius: 1rem;
 }
 
 .roster-card {
@@ -217,6 +223,18 @@ body {
 .login-page {
     background: radial-gradient(circle at top, rgba(255, 193, 7, 0.12), transparent 25%),
                 linear-gradient(180deg, #070a1a 0%, #03050f 100%);
+}
+
+.page-footer {
+    padding: 1.5rem 0;
+    color: #6c757d;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.page-footer p {
+    margin: 0;
+    line-height: 1.5;
 }
 
 .login-card {

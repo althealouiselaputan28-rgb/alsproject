@@ -69,6 +69,7 @@
     let editingArticleId = null;
     let editingRosterId = null;
     let editingRosterImageUrl = '';
+    let editingRosterSection = '';
 
     // DOM handles
     const authBtn = document.getElementById('authBtn');
@@ -78,6 +79,24 @@
     const articleFeed = document.getElementById('articleFeed');
     const feedLoader = document.getElementById('feedLoader');
     const navbarLinks = document.querySelectorAll('[data-page]');
+    const rosterSectionInput = document.getElementById('rosterSection');
+
+    const SECTION_MARKER = '||SECTION:';
+    function parseRosterSubtitle(rawSubtitle) {
+        const subtitleValue = (rawSubtitle || '').toString();
+        if (!subtitleValue) return { label: '', section: '' };
+        if (subtitleValue.includes(SECTION_MARKER)) {
+            const [labelValue, sectionValue] = subtitleValue.split(SECTION_MARKER);
+            return {
+                label: labelValue.trim(),
+                section: (sectionValue || '').trim().toLowerCase()
+            };
+        }
+        return {
+            label: subtitleValue.trim(),
+            section: ''
+        };
+    }
     const pages = {
         home: document.getElementById('homePage'),
         information: document.getElementById('informationPage'),
@@ -452,12 +471,15 @@
                     rosterEditBtn.className = 'btn btn-sm btn-outline-secondary edit-roster-btn d-none';
                     rosterEditBtn.textContent = 'Edit';
                     rosterEditBtn.addEventListener('click', () => {
+                        const parsed = parseRosterSubtitle(item.subtitle || '');
                         editingRosterId = item.id;
                         editingRosterImageUrl = item.image_url || '';
+                        editingRosterSection = parsed.section || '';
+                        if (rosterSectionInput) rosterSectionInput.value = parsed.section || '';
                         const nameInput = document.getElementById('studentName');
                         const subtitleInput = document.getElementById('studentSubtitle');
                         if (nameInput) nameInput.value = item.name || '';
-                        if (subtitleInput) subtitleInput.value = item.subtitle || '';
+                        if (subtitleInput) subtitleInput.value = parsed.label || '';
                         const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
                         modal.show();
                     });
@@ -478,6 +500,7 @@
                             alert(`Delete failed: ${res.error.message}`);
                         } else {
                             await fetchRoster();
+                            updateAuthUI();
                         }
                     });
                     const rosterActionWrap = document.createElement('div');
@@ -497,17 +520,22 @@
                     name.textContent = item.name || 'Unnamed';
                     card.appendChild(img);
                     card.appendChild(name);
-                    const subtitle = (item.subtitle || '').toString().trim();
-                    if (subtitle && subtitle.toLowerCase() !== 'none') {
+                    const parsedSubtitle = parseRosterSubtitle(item.subtitle || '');
+                    const displaySubtitle = parsedSubtitle.label;
+                    if (displaySubtitle && displaySubtitle.toLowerCase() !== 'none') {
                         const subtitleEl = document.createElement('div');
                         subtitleEl.className = 'text-secondary roster-subtitle';
-                        subtitleEl.textContent = subtitle;
+                        subtitleEl.textContent = displaySubtitle;
                         card.appendChild(subtitleEl);
                     }
 
-                    const lowerSubtitle = subtitle.toLowerCase();
-                    const isCabrera = lowerSubtitle.includes('cabrera');
-                    const targetSection = isCabrera ? rosterCabrera : rosterAlcala;
+                    const targetSection = parsedSubtitle.section === 'cabrera'
+                        ? rosterCabrera
+                        : parsedSubtitle.section === 'alcala'
+                            ? rosterAlcala
+                            : displaySubtitle.toLowerCase().includes('cabrera')
+                                ? rosterCabrera
+                                : rosterAlcala;
 
                     col.appendChild(card);
                     targetSection.appendChild(col);
@@ -525,6 +553,7 @@
             button.addEventListener('click', () => {
                 editingRosterId = null;
                 editingRosterImageUrl = '';
+                editingRosterSection = button.dataset.section || '';
                 const section = button.dataset.section;
                 const nameInput = document.getElementById('studentName');
                 const subtitleInput = document.getElementById('studentSubtitle');
@@ -594,11 +623,16 @@
 
                     const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
                     const normalizedSubtitle = subtitle.toLowerCase() === 'none' ? '' : subtitle;
-                    const selectedSection = rosterSectionInput?.value;
+                    const selectedSection = rosterSectionInput?.value || editingRosterSection;
                     if (normalizedSubtitle) {
-                        rosterRow.subtitle = normalizedSubtitle;
+                        rosterRow.subtitle = selectedSection
+                            ? `${normalizedSubtitle}${SECTION_MARKER}${selectedSection}`
+                            : normalizedSubtitle;
                     } else if (selectedSection) {
-                        rosterRow.subtitle = selectedSection === 'cabrera' ? 'Section Cabrera' : 'Section Alcala';
+                        rosterRow.subtitle = `${SECTION_MARKER}${selectedSection}`;
+                    } else {
+                        rosterRow.subtitle = 'Section Alcala';
+                        rosterRow.subtitle += `${SECTION_MARKER}alcala`;
                     }
 
                     // If editing, update the existing row; otherwise insert
