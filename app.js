@@ -384,7 +384,7 @@
 
                 const authorMeta = document.createElement('p');
                 authorMeta.className = 'text-secondary small mb-3 author-line d-flex align-items-center gap-2';
-                authorMeta.innerHTML = `<img src="images/author-icon.svg" alt="Author icon" class="author-icon"> ${article.author || 'Unknown author'}`;
+                authorMeta.innerHTML = `<img src="images/pen-nib-solid-full.svg" alt="Author icon" class="author-icon"> ${article.author || 'Unknown author'}`;
 
                 const meta = document.createElement('p');
                 meta.className = 'text-secondary small';
