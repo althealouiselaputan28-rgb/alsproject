@@ -751,11 +751,19 @@ let thumbnail = null;
                         }
 
                         const { data: publicUrlData, error: publicUrlError } = supabase.storage.from('roster-photos').getPublicUrl(filename);
-                        if (publicUrlError) {
-                            console.error('Public URL error', publicUrlError);
-                            throw publicUrlError;
+                        console.log('Public URL response', publicUrlData, publicUrlError);
+                        if (publicUrlError || !publicUrlData?.publicUrl) {
+                            console.warn('Public URL unavailable, trying signed URL fallback.');
+                            const { data: signedUrlData, error: signedUrlError } = await supabase.storage.from('roster-photos').createSignedUrl(filename, 3600);
+                            console.log('Signed URL response', signedUrlData, signedUrlError);
+                            if (signedUrlError || !signedUrlData?.signedUrl) {
+                                console.error('Signed URL error', signedUrlError);
+                                throw signedUrlError || new Error('Unable to generate image URL');
+                            }
+                            imageUrl = signedUrlData.signedUrl;
+                        } else {
+                            imageUrl = publicUrlData.publicUrl;
                         }
-                        imageUrl = publicUrlData.publicUrl;
                     }
 
                     const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
