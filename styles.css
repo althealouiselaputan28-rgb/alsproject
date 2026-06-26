@@ -1,0 +1,151 @@
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f7f7f7;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  width: min(90vw, 520px);
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 24px 0;
+}
+
+.wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  transform-origin: center center;
+}
+
+#finalGear {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 85%;
+  height: auto;
+  opacity: 1;
+  cursor: grab;
+  user-select: none;
+  animation: rotateClockwise 12s linear infinite;
+  transform-origin: center center;
+  transform: translate(-50%, -50%);
+}
+
+#testImg {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70%;
+  height: auto;
+  cursor: grab;
+  user-select: none;
+  transform: translate(-50%, -50%);
+}
+
+.loading {
+  margin-top: 56px;
+  text-align: center;
+  font-size: 28px;
+  color: #333;
+  font-family: Georgia, serif;
+  font-weight: 700;
+}
+
+.dots {
+  display: inline-block;
+  width: 1.5em;
+  text-align: left;
+}
+
+.dots::after {
+  content: '.';
+  animation: blinkDots 1s steps(4, end) infinite;
+}
+
+.loading-bar-wrapper {
+  margin: 18px auto 0;
+  width: min(80vw, 420px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.loading-bar {
+  flex: 1;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.loader-footer {
+  margin: 0 auto 24px;
+  text-align: center;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.loader-footer p {
+  margin: 0;
+}
+
+.loading-bar__fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #4a90e2, #39b5ff);
+  transition: width 0.1s ease;
+}
+
+.loading-percent {
+  min-width: 48px;
+  text-align: right;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.loader-footer {
+  margin-top: 24px;
+  text-align: center;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.loader-footer p {
+  margin: 0;
+}
+
+@keyframes blinkDots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75%, 100% { content: '...'; }
+}
+
+@keyframes rotateClockwise {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}

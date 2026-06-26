@@ -1,0 +1,313 @@
+/* Color System Theme Specifications */
+body {
+    background-color: #ffffff;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #111111;
+}
+
+.navbar {
+    background-color: #050914;
+}
+
+/* Typography Utilities */
+.tracking-wide { letter-spacing: 0.05em; }
+.tracking-widest { letter-spacing: 0.15em; }
+.small-meta { font-size: 0.65rem; font-weight: 800; }
+.fw-black { font-weight: 900; }
+
+/* Custom Navigation Header Elements */
+.nav-custom-link {
+    color: #a0aec0 !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+.nav-custom-link:hover, .nav-custom-link.active {
+    color: #ffc107 !important;
+    background-color: rgba(255, 193, 7, 0.08);
+    outline: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.brand-text-alternative {
+    color: #ff3b3b;
+    margin-right: 0.4rem;
+}
+.brand-text-learning {
+    color: #28a745;
+    margin-right: 0.4rem;
+}
+.brand-text-system {
+    color: #3b82f6;
+}
+
+/* Hero UI Block Wrapper */
+.hero-banner {
+    background-color: #0a1128;
+    background-image: radial-gradient(circle at top right, rgba(255, 193, 7, 0.03), transparent);
+}
+
+.hero-image-box {
+    background: transparent;
+    border: none;
+    width: auto;
+    max-width: none;
+    min-height: auto;
+    gap: 1rem;
+}
+
+.hero-box-logo {
+    max-height: 150px;
+    width: auto;
+    background: transparent;
+    border: none;
+}
+
+
+/* Core Dashboard Container Structures */
+.custom-card {
+    background-color: #0a1128;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.page-section {
+    display: none;
+}
+
+.roster-card {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.roster-card:hover {
+    transform: translateY(-3px);
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.roster-photo {
+    border: none;
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    display: block;
+    border-radius: 1rem;
+}
+
+.roster-card {
+    min-height: 300px;
+    overflow-x: visible;
+}
+
+.roster-name {
+    margin-top: 0.75rem;
+    font-size: 1rem;
+}
+
+.roster-subtitle {
+    margin-top: 0.25rem;
+    font-size: 0.88rem;
+    color: #adb5bd;
+}
+
+/* Edit buttons */
+.edit-article-btn, .edit-roster-btn, .delete-roster-btn {
+    z-index: 5;
+}
+
+.roster-action-wrap {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.roster-action-wrap .btn {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.75rem;
+}
+
+.roster-card { position: relative; }
+.article-card {
+    position: relative;
+    border-radius: 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.18);
+    border-color: rgba(255, 193, 7, 0.25);
+}
+
+#articleFeed {
+    margin-top: 1rem;
+}
+
+.article-excerpt {
+    color: #cbd5e1;
+    min-height: 5.6rem;
+}
+
+.article-thumb {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.view-article-image {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+}
+
+.author-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.author-line {
+    color: #cbd5e1;
+}
+
+.page-section.active-section {
+    display: block;
+}
+
+.page-section .card.custom-card {
+    min-height: 220px;
+}
+
+.roster-section {
+    background-color: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 193, 7, 0.18);
+    min-height: 320px;
+}
+
+.section-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.section-header .section-add-btn {
+    margin-top: 0.75rem;
+}
+
+.section-default-image {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+}
+
+.section-default-image img {
+    border: none;
+    height: 260px;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 1rem;
+}
+
+.roster-card {
+    min-height: 380px;
+}
+
+.roster-section h3 {
+    margin-bottom: 0;
+}
+
+.roster-section p {
+    margin-bottom: 0;
+    color: #adb5bd;
+}
+
+.roster-item {
+    background-color: #050914;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s;
+}
+.roster-item:hover {
+    background-color: #0d1735;
+}
+
+/* Rich Text Editor Mobile Component Tweaks */
+#editor-container {
+    height: 250px;
+    border-color: #6c757d !important;
+}
+.ql-toolbar.ql-snow {
+    background-color: #212529;
+    border-color: #6c757d !important;
+}
+.ql-snow .ql-stroke { stroke: #fff !important; }
+.ql-snow .ql-fill { fill: #fff !important; }
+.ql-snow .ql-picker { color: #fff !important; }
+
+/* Ensure internal user-uploaded post images scale smoothly on small displays */
+.card-text img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Quill editor gray background to match request */
+#editor-container .ql-editor {
+    background-color: #6c757d !important;
+    color: #fff !important;
+}
+/* Login page styles */
+.login-page {
+    background: radial-gradient(circle at top, rgba(255, 193, 7, 0.12), transparent 25%),
+                linear-gradient(180deg, #070a1a 0%, #03050f 100%);
+}
+
+.page-footer {
+    padding: 1.5rem 0;
+    color: #6c757d;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.page-footer p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.login-card {
+    max-width: 420px;
+    width: 100%;
+    background: rgba(9, 16, 44, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.login-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(255, 193, 7, 0.16);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.login-input {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.login-input:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.18);
+}
+
+.login-form a {
+    color: #ffc107;
+}

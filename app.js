@@ -47,7 +47,7 @@
     }
     console.groupEnd();
 
-    // Initialize Quill (script included in index.html)
+    // Initialize Quill (script included in main.html)
     let quill = null;
     try {
         quill = new Quill('#editor-container', {
@@ -538,9 +538,20 @@ let thumbnail = null;
                     return;
                 }
 
+                const rosterAlcalaPresidents = document.getElementById('rosterAlcalaPresidents');
+                const rosterCabreraPresidents = document.getElementById('rosterCabreraPresidents');
+                let alcalaPresidentCount = 0;
+                let cabreraPresidentCount = 0;
+
                 data.forEach(item => {
+                    const parsedSubtitle = parseRosterSubtitle(item.subtitle || '');
+                    const displaySubtitle = parsedSubtitle.label;
+                    const isPresidentEntry = /president/i.test(displaySubtitle || '');
+                    const isAlcala = parsedSubtitle.section === 'alcala' || displaySubtitle.toLowerCase().includes('alcala');
+                    const isCabrera = parsedSubtitle.section === 'cabrera' || displaySubtitle.toLowerCase().includes('cabrera');
+
                     const col = document.createElement('div');
-                    col.className = 'col-12 col-md-6 col-lg-4';
+                    col.className = isPresidentEntry ? 'col-12' : 'col-12 col-md-6 col-lg-4';
                     const card = document.createElement('div');
                     card.className = 'p-3 rounded roster-card text-center';
                     const rosterEditBtn = document.createElement('button');
@@ -597,8 +608,6 @@ let thumbnail = null;
                     name.textContent = item.name || 'Unnamed';
                     card.appendChild(img);
                     card.appendChild(name);
-                    const parsedSubtitle = parseRosterSubtitle(item.subtitle || '');
-                    const displaySubtitle = parsedSubtitle.label;
                     if (displaySubtitle && displaySubtitle.toLowerCase() !== 'none') {
                         const subtitleEl = document.createElement('div');
                         subtitleEl.className = 'text-secondary roster-subtitle';
@@ -606,16 +615,25 @@ let thumbnail = null;
                         card.appendChild(subtitleEl);
                     }
 
-                    const targetSection = parsedSubtitle.section === 'cabrera'
-                        ? rosterCabrera
-                        : parsedSubtitle.section === 'alcala'
-                            ? rosterAlcala
-                            : displaySubtitle.toLowerCase().includes('cabrera')
-                                ? rosterCabrera
-                                : rosterAlcala;
+                    const targetSection = isCabrera ? rosterCabrera : rosterAlcala;
+                    const targetPresidentSection = isCabrera ? rosterCabreraPresidents : rosterAlcalaPresidents;
+                    const currentPresidentCount = isCabrera ? cabreraPresidentCount : alcalaPresidentCount;
 
                     col.appendChild(card);
-                    targetSection.appendChild(col);
+
+                    if (isPresidentEntry) {
+                        if (isCabrera && cabreraPresidentCount < 2) {
+                            targetPresidentSection.appendChild(col);
+                            cabreraPresidentCount += 1;
+                        } else if (isAlcala && alcalaPresidentCount < 2) {
+                            targetPresidentSection.appendChild(col);
+                            alcalaPresidentCount += 1;
+                        } else {
+                            targetSection.appendChild(col);
+                        }
+                    } else {
+                        targetSection.appendChild(col);
+                    }
                 });
             } catch (e) {
                 rosterAlcala.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
