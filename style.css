@@ -196,13 +196,8 @@ body {
     text-align: center;
 }
 
-.section-header .section-add-btn,
-.section-header .position-add-btn {
+.section-header .section-add-btn {
     margin-top: 0.75rem;
-}
-
-.section-header .position-add-btn {
-    min-width: 120px;
 }
 
 .section-default-image {
@@ -218,19 +213,6 @@ body {
     object-fit: cover;
     display: block;
     border-radius: 1rem;
-}
-
-.leader-card,
-.officer-card {
-    min-height: 260px;
-    background-color: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-}
-
-.leader-card .roster-name,
-.officer-card .roster-name {
-    margin-top: 1rem;
 }
 
 .roster-card {

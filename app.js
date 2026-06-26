@@ -509,22 +509,10 @@ let thumbnail = null;
     async function fetchRoster() {
             const rosterAlcala = document.getElementById('rosterAlcala');
             const rosterCabrera = document.getElementById('rosterCabrera');
-            const alcalaPresident = document.getElementById('alcalaPresident');
-            const alcalaVicePresident = document.getElementById('alcalaVicePresident');
-            const alcalaOfficers = document.getElementById('alcalaOfficers');
-            const cabreraPresident = document.getElementById('cabreraPresident');
-            const cabreraVicePresident = document.getElementById('cabreraVicePresident');
-            const cabreraOfficers = document.getElementById('cabreraOfficers');
-            if (!rosterAlcala || !rosterCabrera || !alcalaPresident || !alcalaVicePresident || !alcalaOfficers || !cabreraPresident || !cabreraVicePresident || !cabreraOfficers) return;
+            if (!rosterAlcala || !rosterCabrera) return;
 
             rosterAlcala.innerHTML = '';
             rosterCabrera.innerHTML = '';
-            alcalaPresident.innerHTML = '';
-            alcalaVicePresident.innerHTML = '';
-            alcalaOfficers.innerHTML = '';
-            cabreraPresident.innerHTML = '';
-            cabreraVicePresident.innerHTML = '';
-            cabreraOfficers.innerHTML = '';
 
             if (!supabase) {
                 rosterAlcala.innerHTML = '<div class="col-12 text-secondary">Roster unavailable in offline mode.</div>';
@@ -533,76 +521,102 @@ let thumbnail = null;
             }
 
             try {
-                const { data, error } = await supabase.from('roster').select('*').order('created_at', { ascending: true });
+                const { data: data, error } = await supabase
+                    .from('roster')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+
                 if (error) {
-                    rosterAlcala.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
-                    rosterCabrera.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
+                    if (rosterAlcala) rosterAlcala.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
+                    if (rosterCabrera) rosterCabrera.innerHTML = `<div class="col-12 text-danger">Failed to load roster: ${error.message}</div>`;
                     return;
                 }
 
                 if (!data || data.length === 0) {
-                    rosterAlcala.innerHTML = '<div class="col-12 text-secondary">No roster entries yet.</div>';
-                    rosterCabrera.innerHTML = '<div class="col-12 text-secondary">No roster entries yet.</div>';
+                    if (rosterAlcala) rosterAlcala.innerHTML = '<div class="col-12 text-secondary">No roster entries yet.</div>';
+                    if (rosterCabrera) rosterCabrera.innerHTML = '<div class="col-12 text-secondary">No roster entries yet.</div>';
                     return;
                 }
 
-                const sectionRoster = {
-                    alcala: { president: null, vicePresident: null, officers: [] },
-                    cabrera: { president: null, vicePresident: null, officers: [] }
-                };
-
-                const officerOrder = ['class president', 'president', 'vice president', 'vp', 'secretary', 'treasurer', 'auditor', 'business manager', 'sergeant at arms', 'pio', 'pios', 'muse', 'prince'];
-                const normalize = text => (text || '').trim().toLowerCase();
-                const isPresident = label => ['class president', 'president'].includes(normalize(label));
-                const isVicePresident = label => ['vice president', 'vp'].includes(normalize(label));
-                const getSectionKey = item => {
-                    const parsed = parseRosterSubtitle(item.subtitle || '');
-                    const rawSection = item.section || parsed.section || '';
-                    return rawSection.toLowerCase() === 'cabrera' ? 'cabrera' : 'alcala';
-                };
-                const getPositionLabel = item => {
-                    const parsed = parseRosterSubtitle(item.subtitle || '');
-                    return item.position || parsed.label || '';
-                };
-
                 data.forEach(item => {
-                    const sectionKey = getSectionKey(item);
-                    const displaySubtitle = getPositionLabel(item);
-                    const container = sectionRoster[sectionKey];
-                    const card = createRosterCard(item, displaySubtitle, sectionKey);
+                    const col = document.createElement('div');
+                    col.className = 'col-12 col-md-6 col-lg-4';
+                    const card = document.createElement('div');
+                    card.className = 'p-3 rounded roster-card text-center';
+                    const rosterEditBtn = document.createElement('button');
+                    rosterEditBtn.type = 'button';
+                    rosterEditBtn.className = 'btn btn-sm btn-outline-secondary edit-roster-btn d-none';
+                    rosterEditBtn.textContent = 'Edit';
+                    rosterEditBtn.addEventListener('click', () => {
+                        const parsed = parseRosterSubtitle(item.subtitle || '');
+                        editingRosterId = item.id;
+                        editingRosterImageUrl = item.image_url || '';
+                        editingRosterSection = parsed.section || '';
+                        if (rosterSectionInput) rosterSectionInput.value = parsed.section || '';
+                        const nameInput = document.getElementById('studentName');
+                        const subtitleInput = document.getElementById('studentSubtitle');
+                        if (nameInput) nameInput.value = item.name || '';
+                        if (subtitleInput) subtitleInput.value = parsed.label || '';
+                        const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
+                        modal.show();
+                    });
 
-                    if (isPresident(displaySubtitle)) {
-                        container.president = card;
-                    } else if (isVicePresident(displaySubtitle)) {
-                        container.vicePresident = card;
-                    } else {
-                        const normalized = normalize(displaySubtitle);
-                        const matchedIndex = officerOrder.findIndex(role => normalized === role);
-                        const orderIndex = matchedIndex >= 0 ? matchedIndex : officerOrder.length;
-                        container.officers.push({ card, orderIndex });
+                    const rosterDeleteBtn = document.createElement('button');
+                    rosterDeleteBtn.type = 'button';
+                    rosterDeleteBtn.className = 'btn btn-sm btn-outline-danger delete-roster-btn d-none';
+                    rosterDeleteBtn.textContent = 'Delete';
+                    rosterDeleteBtn.addEventListener('click', async () => {
+                        if (!confirm('Delete this roster entry? This cannot be undone.')) return;
+                        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                        if (sessionError || !session) {
+                            alert('You must be signed in to delete.');
+                            return;
+                        }
+                        const res = await supabase.from('roster').delete().eq('id', item.id);
+                        if (res.error) {
+                            alert(`Delete failed: ${res.error.message}`);
+                        } else {
+                            await fetchRoster();
+                            updateAuthUI();
+                        }
+                    });
+                    const rosterActionWrap = document.createElement('div');
+                    rosterActionWrap.className = 'roster-action-wrap';
+                    rosterActionWrap.appendChild(rosterEditBtn);
+                    rosterActionWrap.appendChild(rosterDeleteBtn);
+                    card.appendChild(rosterActionWrap);
+                    const img = document.createElement('img');
+                    img.src = item.image_url || item.thumbnail_url;
+                    img.alt = item.name || '';
+                    img.style.maxWidth = '100%';
+                    img.style.height = '170px';
+                    img.style.objectFit = 'cover';
+                    img.className = 'mb-2 rounded roster-photo';
+                    const name = document.createElement('div');
+                    name.className = 'text-white fw-bold roster-name';
+                    name.textContent = item.name || 'Unnamed';
+                    card.appendChild(img);
+                    card.appendChild(name);
+                    const parsedSubtitle = parseRosterSubtitle(item.subtitle || '');
+                    const displaySubtitle = parsedSubtitle.label;
+                    if (displaySubtitle && displaySubtitle.toLowerCase() !== 'none') {
+                        const subtitleEl = document.createElement('div');
+                        subtitleEl.className = 'text-secondary roster-subtitle';
+                        subtitleEl.textContent = displaySubtitle;
+                        card.appendChild(subtitleEl);
                     }
+
+                    const targetSection = parsedSubtitle.section === 'cabrera'
+                        ? rosterCabrera
+                        : parsedSubtitle.section === 'alcala'
+                            ? rosterAlcala
+                            : displaySubtitle.toLowerCase().includes('cabrera')
+                                ? rosterCabrera
+                                : rosterAlcala;
+
+                    col.appendChild(card);
+                    targetSection.appendChild(col);
                 });
-
-                const sortOfficers = officers => officers.sort((a, b) => a.orderIndex - b.orderIndex).map(item => item.card);
-
-                const appendLeader = (container, card, placeholder) => {
-                    if (!card) {
-                        const placeholderEl = document.createElement('div');
-                        placeholderEl.className = 'text-secondary fst-italic';
-                        placeholderEl.textContent = placeholder;
-                        container.appendChild(placeholderEl);
-                        return;
-                    }
-                    container.appendChild(card);
-                };
-
-                appendLeader(alcalaPresident, sectionRoster.alcala.president, 'No president assigned yet.');
-                appendLeader(alcalaVicePresident, sectionRoster.alcala.vicePresident, 'No vice president assigned yet.');
-                sortOfficers(sectionRoster.alcala.officers).forEach(card => alcalaOfficers.appendChild(card));
-
-                appendLeader(cabreraPresident, sectionRoster.cabrera.president, 'No president assigned yet.');
-                appendLeader(cabreraVicePresident, sectionRoster.cabrera.vicePresident, 'No vice president assigned yet.');
-                sortOfficers(sectionRoster.cabrera.officers).forEach(card => cabreraOfficers.appendChild(card));
             } catch (e) {
                 rosterAlcala.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
                 rosterCabrera.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
@@ -610,82 +624,8 @@ let thumbnail = null;
             }
         }
 
-        function createRosterCard(item, displaySubtitle, sectionKey) {
-            const card = document.createElement('div');
-            card.className = 'p-3 rounded officer-card text-center';
-            const rosterEditBtn = document.createElement('button');
-            rosterEditBtn.type = 'button';
-            rosterEditBtn.className = 'btn btn-sm btn-outline-secondary edit-roster-btn d-none';
-            rosterEditBtn.textContent = 'Edit';
-            rosterEditBtn.addEventListener('click', () => {
-                const parsed = parseRosterSubtitle(item.subtitle || '');
-                editingRosterId = item.id;
-                editingRosterImageUrl = item.image_url || '';
-                editingRosterSection = parsed.section || '';
-                if (rosterSectionInput) rosterSectionInput.value = parsed.section || '';
-                const nameInput = document.getElementById('studentName');
-                const subtitleInput = document.getElementById('studentSubtitle');
-                if (nameInput) nameInput.value = item.name || '';
-                if (subtitleInput) subtitleInput.value = parsed.label || '';
-                const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
-                modal.show();
-            });
-
-            const rosterDeleteBtn = document.createElement('button');
-            rosterDeleteBtn.type = 'button';
-            rosterDeleteBtn.className = 'btn btn-sm btn-outline-danger delete-roster-btn d-none';
-            rosterDeleteBtn.textContent = 'Delete';
-            rosterDeleteBtn.addEventListener('click', async () => {
-                if (!confirm('Delete this roster entry? This cannot be undone.')) return;
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                if (sessionError || !session) {
-                    alert('You must be signed in to delete.');
-                    return;
-                }
-                const res = await supabase.from('roster').delete().eq('id', item.id);
-                if (res.error) {
-                    alert(`Delete failed: ${res.error.message}`);
-                } else {
-                    await fetchRoster();
-                    updateAuthUI();
-                }
-            });
-
-            const rosterActionWrap = document.createElement('div');
-            rosterActionWrap.className = 'roster-action-wrap';
-            rosterActionWrap.appendChild(rosterEditBtn);
-            rosterActionWrap.appendChild(rosterDeleteBtn);
-            card.appendChild(rosterActionWrap);
-
-            const img = document.createElement('img');
-            img.src = item.image_url || item.thumbnail_url || '';
-            img.alt = item.name || '';
-            img.style.maxWidth = '100%';
-            img.style.height = '170px';
-            img.style.objectFit = 'cover';
-            img.className = 'mb-2 rounded roster-photo';
-            if (!img.src) {
-                img.src = 'images/nartatez.jpg';
-                img.alt = item.name ? `${item.name} photo` : 'Roster placeholder';
-            }
-            const name = document.createElement('div');
-            name.className = 'text-white fw-bold roster-name';
-            name.textContent = item.name || 'Unnamed';
-            card.appendChild(img);
-            card.appendChild(name);
-
-            if (displaySubtitle && displaySubtitle.toLowerCase() !== 'none') {
-                const subtitleEl = document.createElement('div');
-                subtitleEl.className = 'text-secondary roster-subtitle';
-                subtitleEl.textContent = displaySubtitle;
-                card.appendChild(subtitleEl);
-            }
-
-            return card;
-        }
-
         // Hook section-specific add buttons
-        const sectionAddBtns = document.querySelectorAll('.section-add-btn, .position-add-btn');
+        const sectionAddBtns = document.querySelectorAll('.section-add-btn');
         sectionAddBtns.forEach(button => {
             button.addEventListener('click', () => {
                 editingRosterId = null;
@@ -696,7 +636,7 @@ let thumbnail = null;
                 const subtitleInput = document.getElementById('studentSubtitle');
                 if (rosterSectionInput) rosterSectionInput.value = section || '';
                 if (nameInput) nameInput.value = '';
-                if (subtitleInput) subtitleInput.value = button.dataset.position || '';
+                if (subtitleInput) subtitleInput.value = section === 'cabrera' ? 'Section Cabrera' : 'Section Alcala';
                 const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
                 modal.show();
             });
@@ -764,6 +704,7 @@ let thumbnail = null;
                         } else {
                             imageUrl = publicUrlData.publicUrl;
                         }
+                        console.log('Resolved image URL for DB', imageUrl);
                     }
 
                     const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
@@ -832,8 +773,8 @@ let thumbnail = null;
                 if (session) {
                     if (addBtn) addBtn.classList.remove('d-none');
                     if (createBtn) createBtn.classList.remove('d-none');
-                        // reveal section add buttons, position add buttons, edit and delete buttons
-                        document.querySelectorAll('.section-add-btn, .position-add-btn').forEach(b => b.classList.remove('d-none'));
+                        // reveal section add buttons, edit and delete buttons
+                        document.querySelectorAll('.section-add-btn').forEach(b => b.classList.remove('d-none'));
                         document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.remove('d-none'));
                         document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.remove('d-none'));
                         document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.remove('d-none'));
@@ -841,7 +782,7 @@ let thumbnail = null;
                 } else {
                     if (addBtn) addBtn.classList.add('d-none');
                     if (createBtn) createBtn.classList.add('d-none');
-                        document.querySelectorAll('.section-add-btn, .position-add-btn').forEach(b => b.classList.add('d-none'));
+                        document.querySelectorAll('.section-add-btn').forEach(b => b.classList.add('d-none'));
                         document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.add('d-none'));
                         document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.add('d-none'));
                         document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.add('d-none'));
