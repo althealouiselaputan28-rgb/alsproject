@@ -551,15 +551,23 @@ let thumbnail = null;
                     cabrera: { president: null, vicePresident: null, officers: [] }
                 };
 
-                const officerOrder = ['secretary', 'treasurer', 'auditor', 'business manager', 'sergeant at arms', 'pio', 'pios', 'muse', 'prince'];
+                const officerOrder = ['class president', 'president', 'vice president', 'vp', 'secretary', 'treasurer', 'auditor', 'business manager', 'sergeant at arms', 'pio', 'pios', 'muse', 'prince'];
                 const normalize = text => (text || '').trim().toLowerCase();
                 const isPresident = label => ['class president', 'president'].includes(normalize(label));
                 const isVicePresident = label => ['vice president', 'vp'].includes(normalize(label));
+                const getSectionKey = item => {
+                    const parsed = parseRosterSubtitle(item.subtitle || '');
+                    const rawSection = item.section || parsed.section || '';
+                    return rawSection.toLowerCase() === 'cabrera' ? 'cabrera' : 'alcala';
+                };
+                const getPositionLabel = item => {
+                    const parsed = parseRosterSubtitle(item.subtitle || '');
+                    return item.position || parsed.label || '';
+                };
 
                 data.forEach(item => {
-                    const parsedSubtitle = parseRosterSubtitle(item.subtitle || '');
-                    const displaySubtitle = parsedSubtitle.label;
-                    const sectionKey = parsedSubtitle.section === 'cabrera' ? 'cabrera' : 'alcala';
+                    const sectionKey = getSectionKey(item);
+                    const displaySubtitle = getPositionLabel(item);
                     const container = sectionRoster[sectionKey];
                     const card = createRosterCard(item, displaySubtitle, sectionKey);
 
@@ -569,8 +577,9 @@ let thumbnail = null;
                         container.vicePresident = card;
                     } else {
                         const normalized = normalize(displaySubtitle);
-                        const orderIndex = officerOrder.findIndex(role => normalized === role);
-                        container.officers.push({ card, orderIndex: orderIndex >= 0 ? orderIndex : officerOrder.length });
+                        const matchedIndex = officerOrder.findIndex(role => normalized === role);
+                        const orderIndex = matchedIndex >= 0 ? matchedIndex : officerOrder.length;
+                        container.officers.push({ card, orderIndex });
                     }
                 });
 
@@ -649,12 +658,16 @@ let thumbnail = null;
             card.appendChild(rosterActionWrap);
 
             const img = document.createElement('img');
-            img.src = item.image_url || '';
+            img.src = item.image_url || item.thumbnail_url || '';
             img.alt = item.name || '';
             img.style.maxWidth = '100%';
             img.style.height = '170px';
             img.style.objectFit = 'cover';
             img.className = 'mb-2 rounded roster-photo';
+            if (!img.src) {
+                img.src = 'images/nartatez.jpg';
+                img.alt = item.name ? `${item.name} photo` : 'Roster placeholder';
+            }
             const name = document.createElement('div');
             name.className = 'text-white fw-bold roster-name';
             name.textContent = item.name || 'Unnamed';
