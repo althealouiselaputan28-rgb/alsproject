@@ -188,6 +188,10 @@ body {
     min-height: 320px;
 }
 
+.roster-section-column.is-hidden {
+    display: none !important;
+}
+
 .section-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     padding-bottom: 0.75rem;

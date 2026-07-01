@@ -26,7 +26,7 @@
                 <ul class="navbar-nav gap-2 mt-3 mt-lg-0 align-items-lg-center">
                     <li class="nav-item"><a class="nav-link nav-custom-link active" href="#home" data-page="home">Home</a></li>
                     <li class="nav-item"><a class="nav-link nav-custom-link" href="#information" data-page="information">Information</a></li>
-                    <li class="nav-item"><a class="nav-link nav-custom-link" href="#roster" data-page="roster">Roster</a></li>
+                    <li class="nav-item"><a class="nav-link nav-custom-link" href="#roster" data-page="roster" data-roster-prompt="true">Roster</a></li>
                     <li class="nav-item ms-lg-2">
                         <button class="btn btn-outline-danger btn-sm px-3 fw-semibold text-uppercase" id="authBtn">Login</button>
                     </li>
@@ -84,7 +84,7 @@
                         <div class="card-body p-4">
                             <h2 class="h5 text-danger text-uppercase tracking-wide fw-bold mb-4">Quick Access</h2>
                             <div class="d-flex flex-column gap-3" id="rosterGrid">
-                                <a href="#roster" class="roster-item p-3 rounded d-flex align-items-center justify-content-between text-decoration-none">
+                                <a href="#roster" class="roster-item p-3 rounded d-flex align-items-center justify-content-between text-decoration-none" data-roster-prompt="true">
                                     <span class="text-white small fw-bold tracking-wide">📄 STUDENT ROSTER</span>
                                 </a>
                                 <a href="#information" class="roster-item p-3 rounded d-flex align-items-center justify-content-between text-decoration-none">
@@ -128,13 +128,17 @@
                         </div>
 
                         <div class="row g-3 mt-3">
-                            <div class="col-6">
+                            <div class="col-12 roster-section-column" data-roster-section="alcala">
                                 <div class="roster-section p-3 rounded">
                                     <div class="section-header d-flex align-items-center justify-content-between mb-3">
                                         <div>
                                             <h3 class="text-white h5 mb-1">Section Alcala</h3>
                                         </div>
-                                        <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="alcala">Add to Alcala</button>
+                                        <div>
+                                            <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="alcala">Add Student</button>
+                                            <button class="btn btn-sm btn-warning d-none section-add-president-btn ms-2" data-section="alcala" data-role="president">Add President</button>
+                                            <button class="btn btn-sm btn-outline-warning d-none section-add-vice-btn ms-2" data-section="alcala" data-role="vice">Add Vice President</button>
+                                        </div>
                                     </div>
                                     <div class="section-default-image text-center mb-3">
                                         <img src="images/nartatez.jpg" alt="Section Alcala default image" class="img-fluid rounded shadow-sm roster-photo" />
@@ -143,22 +147,21 @@
                                         <p class="text-white fw-bold">Mrs. Ailyn J Ramones</p>
                                         <p class="text-secondary fst-italic">Adviser</p>
                                     </div>
-                                    <div class="row g-3">
-                                        <div class="col-12 col-lg-4">
-                                            <div id="rosterAlcalaPresidents" class="row g-3"></div>
-                                        </div>
-                                        <div class="col-12 col-lg-8 d-none d-lg-block"></div>
-                                    </div>
-                                    <div id="rosterAlcala" class="row g-3 mt-3"></div>
+                                    <div id="rosterAlcalaOfficers" class="row g-3 mb-3"></div>
+                                    <div id="rosterAlcala" class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3 mt-3"></div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12 roster-section-column" data-roster-section="cabrera">
                                 <div class="roster-section p-3 rounded">
                                     <div class="section-header d-flex align-items-center justify-content-between mb-3">
                                         <div>
                                             <h3 class="text-white h5 mb-1">Section Cabrera</h3>
                                         </div>
-                                        <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="cabrera">Add to Cabrera</button>
+                                        <div>
+                                            <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="cabrera">Add Student</button>
+                                            <button class="btn btn-sm btn-warning d-none section-add-president-btn ms-2" data-section="cabrera" data-role="president">Add President</button>
+                                            <button class="btn btn-sm btn-outline-warning d-none section-add-vice-btn ms-2" data-section="cabrera" data-role="vice">Add Vice President</button>
+                                        </div>
                                     </div>
                                     <div class="section-default-image text-center mb-3">
                                         <img src="images/magtubo.jpeg" alt="Section Cabrera default image" class="img-fluid rounded shadow-sm roster-photo" />
@@ -167,13 +170,8 @@
                                         <p class="text-white fw-bold">Mrs. Nescy Joy P. Magtubo</p>
                                         <p class="text-secondary fst-italic">Adviser</p>
                                     </div>
-                                    <div class="row g-3">
-                                        <div class="col-12 col-lg-4">
-                                            <div id="rosterCabreraPresidents" class="row g-3"></div>
-                                        </div>
-                                        <div class="col-12 col-lg-8 d-none d-lg-block"></div>
-                                    </div>
-                                    <div id="rosterCabrera" class="row g-3 mt-3"></div>
+                                    <div id="rosterCabreraOfficers" class="row g-3 mb-3"></div>
+                                    <div id="rosterCabrera" class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3 mt-3"></div>
                                 </div>
                             </div>
                         </div>
@@ -247,6 +245,24 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
 
     <!-- Login Modal -->
+    <div class="modal fade" id="rosterSectionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-white text-uppercase tracking-wide">Roster Selection</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-white p-4">
+                    <p class="text-secondary mb-4">Which section were you from?</p>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-warning fw-semibold" id="rosterSelectAlcalaBtn">Alcala</button>
+                        <button type="button" class="btn btn-outline-warning fw-semibold" id="rosterSelectCabreraBtn">Cabrera</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark border border-secondary">
@@ -281,6 +297,7 @@
                 </div>
                 <form id="addStudentForm" class="modal-body text-white p-4">
                     <input id="rosterSection" type="hidden" value="">
+                    <input id="officerRole" type="hidden" value="">
                     <div class="mb-3">
                         <label for="studentName" class="form-label">Student Name</label>
                         <input id="studentName" class="form-control bg-secondary text-white border-0" placeholder="Full name">

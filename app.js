@@ -129,6 +129,11 @@
     const viewArticleDate = document.getElementById('viewArticleDate');
     const viewArticleContent = document.getElementById('viewArticleContent');
     const viewArticleImage = document.getElementById('viewArticleImage');
+    const rosterSectionModalEl = document.getElementById('rosterSectionModal');
+    const rosterSelectAlcalaBtn = document.getElementById('rosterSelectAlcalaBtn');
+    const rosterSelectCabreraBtn = document.getElementById('rosterSelectCabreraBtn');
+    const rosterPromptLinks = document.querySelectorAll('[data-roster-prompt="true"]');
+    const rosterSectionStorageKey = 'alsRosterSectionSelection';
     try {
         bootstrapModal = new bootstrap.Modal(document.getElementById('editorModal'));
     } catch (e) {
@@ -146,6 +151,50 @@
         if (viewArticleModalEl) viewArticleBootstrapModal = new bootstrap.Modal(viewArticleModalEl);
     } catch (e) {
         console.warn('View article modal not available.', e);
+    }
+
+    let rosterSectionBootstrapModal = null;
+    try {
+        if (rosterSectionModalEl) rosterSectionBootstrapModal = new bootstrap.Modal(rosterSectionModalEl);
+    } catch (e) {
+        console.warn('Roster section modal not available.', e);
+    }
+
+    let selectedRosterSection = sessionStorage.getItem(rosterSectionStorageKey) || '';
+
+    function applyRosterSectionFilter(section = selectedRosterSection) {
+        const normalized = (section || '').toLowerCase();
+        selectedRosterSection = normalized;
+
+        if (normalized) {
+            sessionStorage.setItem(rosterSectionStorageKey, normalized);
+        } else {
+            sessionStorage.removeItem(rosterSectionStorageKey);
+        }
+
+        document.querySelectorAll('.roster-section-column').forEach(column => {
+            const shouldShow = !normalized || column.dataset.rosterSection === normalized;
+            column.classList.toggle('is-hidden', !shouldShow);
+            column.classList.toggle('d-none', !shouldShow);
+        });
+    }
+
+    function showRosterSectionPrompt() {
+        if (rosterSectionBootstrapModal) {
+            rosterSectionBootstrapModal.show();
+        } else {
+            activatePage('roster');
+            applyRosterSectionFilter(selectedRosterSection);
+        }
+    }
+
+    function chooseRosterSection(section) {
+        const normalized = (section || '').toLowerCase();
+        if (!['alcala', 'cabrera'].includes(normalized)) return;
+
+        applyRosterSectionFilter(normalized);
+        activatePage('roster');
+        if (rosterSectionBootstrapModal) rosterSectionBootstrapModal.hide();
     }
 
     function activatePage(pageKey, updateHash = true) {
@@ -281,6 +330,16 @@
         });
     }
 
+    applyRosterSectionFilter(selectedRosterSection);
+
+    if (rosterSelectAlcalaBtn) {
+        rosterSelectAlcalaBtn.addEventListener('click', () => chooseRosterSection('alcala'));
+    }
+
+    if (rosterSelectCabreraBtn) {
+        rosterSelectCabreraBtn.addEventListener('click', () => chooseRosterSection('cabrera'));
+    }
+
     // Navigation links
     if (navbarLinks && navbarLinks.length) {
         navbarLinks.forEach(link => {
@@ -288,7 +347,18 @@
                 event.preventDefault();
                 const page = link.dataset.page;
                 if (!page || !pages[page]) return;
+                if (page === 'roster') {
+                    showRosterSectionPrompt();
+                    return;
+                }
                 activatePage(page);
+            });
+        });
+
+        rosterPromptLinks.forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                showRosterSectionPrompt();
             });
         });
 
@@ -538,20 +608,16 @@ let thumbnail = null;
                     return;
                 }
 
-                const rosterAlcalaPresidents = document.getElementById('rosterAlcalaPresidents');
-                const rosterCabreraPresidents = document.getElementById('rosterCabreraPresidents');
-                let alcalaPresidentCount = 0;
-                let cabreraPresidentCount = 0;
+                // Removed separate president sections — render all roster cards uniformly
 
                 data.forEach(item => {
                     const parsedSubtitle = parseRosterSubtitle(item.subtitle || '');
                     const displaySubtitle = parsedSubtitle.label;
-                    const isPresidentEntry = /president/i.test(displaySubtitle || '');
                     const isAlcala = parsedSubtitle.section === 'alcala' || displaySubtitle.toLowerCase().includes('alcala');
                     const isCabrera = parsedSubtitle.section === 'cabrera' || displaySubtitle.toLowerCase().includes('cabrera');
 
                     const col = document.createElement('div');
-                    col.className = isPresidentEntry ? 'col-12' : 'col-12 col-md-6 col-lg-4';
+                    col.className = 'col';
                     const card = document.createElement('div');
                     card.className = 'p-3 rounded roster-card text-center';
                     const rosterEditBtn = document.createElement('button');
@@ -616,24 +682,8 @@ let thumbnail = null;
                     }
 
                     const targetSection = isCabrera ? rosterCabrera : rosterAlcala;
-                    const targetPresidentSection = isCabrera ? rosterCabreraPresidents : rosterAlcalaPresidents;
-                    const currentPresidentCount = isCabrera ? cabreraPresidentCount : alcalaPresidentCount;
-
                     col.appendChild(card);
-
-                    if (isPresidentEntry) {
-                        if (isCabrera && cabreraPresidentCount < 2) {
-                            targetPresidentSection.appendChild(col);
-                            cabreraPresidentCount += 1;
-                        } else if (isAlcala && alcalaPresidentCount < 2) {
-                            targetPresidentSection.appendChild(col);
-                            alcalaPresidentCount += 1;
-                        } else {
-                            targetSection.appendChild(col);
-                        }
-                    } else {
-                        targetSection.appendChild(col);
-                    }
+                    targetSection.appendChild(col);
                 });
             } catch (e) {
                 rosterAlcala.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
