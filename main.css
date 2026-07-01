@@ -92,6 +92,9 @@ body {
     border: none;
     width: 100%;
     height: 170px;
+
+/* Officer card specific styles */
+
     object-fit: cover;
     display: block;
     border-radius: 1rem;
@@ -219,6 +222,19 @@ body {
     display: block;
     border-radius: 1rem;
 }
+
+/* Extra images directly under the section default image */
+.extra-images { max-width: 520px; margin: 0 auto; display: flex; gap: 10rem; }
+.extra-images .extra-img { width: 220px; height: 260px; object-fit: cover; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.06); }
+@media (max-width: 576px) {
+    .extra-images { gap: 1rem; }
+    .extra-images .extra-img { width: 160px; height: 190px; }
+}
+
+/* Extra image caption styles */
+.extra-item { display: flex; flex-direction: column; align-items: center; }
+.extra-name { font-weight: 700; color: #ffffff; }
+.extra-role { font-style: italic; color: #adb5bd; font-size: 0.95rem; margin-top: 0.25rem; }
 
 .roster-card {
     min-height: 380px;

@@ -685,6 +685,8 @@ let thumbnail = null;
                     col.appendChild(card);
                     targetSection.appendChild(col);
                 });
+
+                
             } catch (e) {
                 rosterAlcala.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
                 rosterCabrera.innerHTML = '<div class="col-12 text-danger">Error loading roster.</div>';
@@ -709,6 +711,8 @@ let thumbnail = null;
                 modal.show();
             });
         });
+
+        
 
         // Hook Add Student form
         const addStudentForm = document.getElementById('addStudentForm');
@@ -775,9 +779,10 @@ let thumbnail = null;
                         console.log('Resolved image URL for DB', imageUrl);
                     }
 
+                    const selectedSection = rosterSectionInput?.value || editingRosterSection;
+
                     const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
                     const normalizedSubtitle = subtitle.toLowerCase() === 'none' ? '' : subtitle;
-                    const selectedSection = rosterSectionInput?.value || editingRosterSection;
                     if (normalizedSubtitle) {
                         rosterRow.subtitle = selectedSection
                             ? `${normalizedSubtitle}${SECTION_MARKER}${selectedSection}`
@@ -788,8 +793,6 @@ let thumbnail = null;
                         rosterRow.subtitle = 'Section Alcala';
                         rosterRow.subtitle += `${SECTION_MARKER}alcala`;
                     }
-
-                    // If editing, update the existing row; otherwise insert
                     let dbRes;
                     if (editingRosterId) {
                         dbRes = await supabase.from('roster').update(rosterRow).eq('id', editingRosterId);
@@ -797,6 +800,8 @@ let thumbnail = null;
                         dbRes = await supabase.from('roster').insert([rosterRow]);
                     }
                     if (dbRes.error) throw dbRes.error;
+                    editingRosterId = null;
+                    editingRosterImageUrl = '';
 
                     // clear and close modal
                     nameInput.value = '';

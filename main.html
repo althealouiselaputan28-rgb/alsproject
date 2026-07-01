@@ -134,20 +134,31 @@
                                         <div>
                                             <h3 class="text-white h5 mb-1">Section Alcala</h3>
                                         </div>
-                                        <div>
-                                            <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="alcala">Add Student</button>
-                                            <button class="btn btn-sm btn-warning d-none section-add-president-btn ms-2" data-section="alcala" data-role="president">Add President</button>
-                                            <button class="btn btn-sm btn-outline-warning d-none section-add-vice-btn ms-2" data-section="alcala" data-role="vice">Add Vice President</button>
-                                        </div>
+                                        <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="alcala">Add to Alcala</button>
                                     </div>
                                     <div class="section-default-image text-center mb-3">
-                                        <img src="images/nartatez.jpg" alt="Section Alcala default image" class="img-fluid rounded shadow-sm roster-photo" />
-                                    </div>
+                                            <img src="images/nartatez.jpg" alt="Section Alcala default image" class="img-fluid rounded shadow-sm roster-photo" />
+                                        </div>
                                     <div class="text-center mb-3">
-                                        <p class="text-white fw-bold">Mrs. Ailyn J Ramones</p>
-                                        <p class="text-secondary fst-italic">Adviser</p>
-                                    </div>
-                                    <div id="rosterAlcalaOfficers" class="row g-3 mb-3"></div>
+                                            <p class="text-white fw-bold">Mrs. Ailyn J Ramones</p>
+                                            <p class="text-secondary fst-italic">Adviser</p>
+                                        </div>
+                                        <div class="extra-images d-flex justify-content-center mt-3">
+                                            <div class="extra-item text-center">
+                                                <img src="images/alcalapres.jpg" alt="Extra image 1" class="img-fluid rounded extra-img" />
+                                                <div class="extra-caption mt-2">
+                                                    <div class="extra-name">Joseph T. Araneta</div>
+                                                    <div class="extra-role"> President</div>
+                                                </div>
+                                            </div>
+                                            <div class="extra-item text-center">
+                                                <img src="images/tntslogo.png" alt="Extra image 2" class="img-fluid rounded extra-img" />
+                                                <div class="extra-caption mt-2">
+                                                    <div class="extra-name">Rotcileta Perez</div>
+                                                    <div class="extra-role">Vice President</div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     <div id="rosterAlcala" class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3 mt-3"></div>
                                 </div>
                             </div>
@@ -157,11 +168,7 @@
                                         <div>
                                             <h3 class="text-white h5 mb-1">Section Cabrera</h3>
                                         </div>
-                                        <div>
-                                            <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="cabrera">Add Student</button>
-                                            <button class="btn btn-sm btn-warning d-none section-add-president-btn ms-2" data-section="cabrera" data-role="president">Add President</button>
-                                            <button class="btn btn-sm btn-outline-warning d-none section-add-vice-btn ms-2" data-section="cabrera" data-role="vice">Add Vice President</button>
-                                        </div>
+                                        <button class="btn btn-sm btn-warning d-none section-add-btn" data-section="cabrera">Add to Cabrera</button>
                                     </div>
                                     <div class="section-default-image text-center mb-3">
                                         <img src="images/magtubo.jpeg" alt="Section Cabrera default image" class="img-fluid rounded shadow-sm roster-photo" />
@@ -170,7 +177,22 @@
                                         <p class="text-white fw-bold">Mrs. Nescy Joy P. Magtubo</p>
                                         <p class="text-secondary fst-italic">Adviser</p>
                                     </div>
-                                    <div id="rosterCabreraOfficers" class="row g-3 mb-3"></div>
+                                    <div class="extra-images d-flex justify-content-center mt-3">
+                                        <div class="extra-item text-center">
+                                            <img src="images/placeholder-1.png" alt="Extra image 1" class="img-fluid rounded extra-img" />
+                                            <div class="extra-caption mt-2">
+                                                <div class="extra-name">Joseph T. Araneta</div>
+                                                <div class="extra-role">Class President</div>
+                                            </div>
+                                        </div>
+                                        <div class="extra-item text-center">
+                                            <img src="images/placeholder-2.png" alt="Extra image 2" class="img-fluid rounded extra-img" />
+                                            <div class="extra-caption mt-2">
+                                                <div class="extra-name">Rotcileta Perez</div>
+                                                <div class="extra-role">Vice President</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div id="rosterCabrera" class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3 mt-3"></div>
                                 </div>
                             </div>
@@ -297,7 +319,6 @@
                 </div>
                 <form id="addStudentForm" class="modal-body text-white p-4">
                     <input id="rosterSection" type="hidden" value="">
-                    <input id="officerRole" type="hidden" value="">
                     <div class="mb-3">
                         <label for="studentName" class="form-label">Student Name</label>
                         <input id="studentName" class="form-control bg-secondary text-white border-0" placeholder="Full name">
