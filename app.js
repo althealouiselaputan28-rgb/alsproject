@@ -1,12 +1,12 @@
 /* Client entry script — uses dynamic import for Supabase so the page still runs on plain static servers */
 (async function() {
     let supabase = null;
+    let SUPABASE_URL = (import.meta && import.meta.env) ? import.meta.env.VITE_SUPABASE_URL : undefined;
+    let SUPABASE_ANON_KEY = (import.meta && import.meta.env) ? import.meta.env.VITE_SUPABASE_ANON_KEY : undefined;
 
     try {
         const mod = await import('@supabase/supabase-js');
         const createClient = mod.createClient;
-        const SUPABASE_URL = (import.meta && import.meta.env) ? import.meta.env.VITE_SUPABASE_URL : undefined;
-        const SUPABASE_ANON_KEY = (import.meta && import.meta.env) ? import.meta.env.VITE_SUPABASE_ANON_KEY : undefined;
 
         if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
