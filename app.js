@@ -74,6 +74,7 @@
 
     // DOM handles
     const authBtn = document.getElementById('authBtn');
+    const adminPortalNav = document.getElementById('adminPortalNav');
     const createPostBtn = document.getElementById('createPostBtn');
     const publishPostBtn = document.getElementById('publishPostBtn');
     const postTitleInput = document.getElementById('postTitle');
@@ -364,7 +365,13 @@
             link.addEventListener('click', event => {
                 event.preventDefault();
                 const page = link.dataset.page;
-                if (!page || !pages[page]) return;
+                if (!page) return;
+                if (page === 'adminPortal') {
+                    if (createPostBtn) {
+                        createPostBtn.click();
+                    }
+                    return;
+                }
                 if (page === 'roster') {
                     showRosterSectionPrompt();
                     return;
@@ -872,41 +879,87 @@ let thumbnail = null;
         // Expose fetchRoster to initial run
         fetchRoster();
 
-        // Show admin-only UI when signed in
+        async function getUserProfile(session) {
+            if (!supabase || !session || !session.user) {
+                return null;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('role, username, full_name, email')
+                    .eq('id', session.user.id)
+                    .maybeSingle();
+                if (error) {
+                    console.warn('Profile lookup failed', error);
+                    return null;
+                }
+                return data;
+            } catch (e) {
+                console.warn('Profile fetch error', e);
+                return null;
+            }
+        }
+
+        // Show admin/moderator UI when signed in
         async function updateAuthUI() {
             const addBtn = document.getElementById('addStudentBtn');
             const createBtn = document.getElementById('createPostBtn');
             if (!supabase) {
                 if (addBtn) addBtn.classList.add('d-none');
                 if (createBtn) createBtn.classList.add('d-none');
+                if (adminPortalNav) adminPortalNav.classList.add('d-none');
+                document.querySelectorAll('.section-add-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.add('d-none'));
                 return;
             }
 
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    if (addBtn) addBtn.classList.remove('d-none');
-                    if (createBtn) createBtn.classList.remove('d-none');
-                        // reveal section add buttons, edit and delete buttons
-                        document.querySelectorAll('.section-add-btn').forEach(b => b.classList.remove('d-none'));
-                        document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.remove('d-none'));
-                        document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.remove('d-none'));
-                        document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.remove('d-none'));
-                        document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.remove('d-none'));
-                } else {
+                if (!session) {
                     if (addBtn) addBtn.classList.add('d-none');
                     if (createBtn) createBtn.classList.add('d-none');
-                        document.querySelectorAll('.section-add-btn').forEach(b => b.classList.add('d-none'));
-                        document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.add('d-none'));
-                        document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.add('d-none'));
-                        document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.add('d-none'));
-                        document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.add('d-none'));
+                    if (adminPortalNav) adminPortalNav.classList.add('d-none');
+                    document.querySelectorAll('.section-add-btn').forEach(b => b.classList.add('d-none'));
+                    document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.add('d-none'));
+                    document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.add('d-none'));
+                    document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.add('d-none'));
+                    document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.add('d-none'));
+                    return;
                 }
+
+                const profile = await getUserProfile(session);
+                const role = profile?.role || 'user';
+                const isAdmin = role === 'admin';
+                const isModerator = role === 'moderator';
+                const canPublish = isAdmin || isModerator;
+
+                if (addBtn) addBtn.classList.toggle('d-none', !isAdmin);
+                if (createBtn) createBtn.classList.toggle('d-none', !canPublish);
+                if (adminPortalNav) adminPortalNav.classList.toggle('d-none', !isAdmin);
+
+                document.querySelectorAll('.section-add-btn').forEach(b => b.classList.toggle('d-none', !isAdmin));
+                document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.toggle('d-none', !isAdmin));
+                document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.toggle('d-none', !isAdmin));
+                document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.toggle('d-none', !isAdmin));
+                document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.toggle('d-none', !isAdmin));
             } catch (e) {
                 console.warn('Failed to check session', e);
                 if (addBtn) addBtn.classList.add('d-none');
+                if (createBtn) createBtn.classList.add('d-none');
+                if (adminPortalNav) adminPortalNav.classList.add('d-none');
+                document.querySelectorAll('.section-add-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.edit-article-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.edit-roster-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.delete-article-btn').forEach(b => b.classList.add('d-none'));
+                document.querySelectorAll('.delete-roster-btn').forEach(b => b.classList.add('d-none'));
             }
         }
+
+        window.updateAuthUI = updateAuthUI;
 
         updateAuthUI();
 

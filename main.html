@@ -26,9 +26,10 @@
                 <ul class="navbar-nav gap-2 mt-3 mt-lg-0 align-items-lg-center">
                     <li class="nav-item"><a class="nav-link nav-custom-link active" href="#home" data-page="home">Home</a></li>
                     <li class="nav-item"><a class="nav-link nav-custom-link" href="#information" data-page="information">Information</a></li>
+                    <li class="nav-item"><a class="nav-link nav-custom-link d-none" href="admin.html" id="adminPortalNav">Admin Portal</a></li>
                     <li class="nav-item"><a class="nav-link nav-custom-link" href="#roster" data-page="roster" data-roster-prompt="true">Roster</a></li>
                     <li class="nav-item ms-lg-2">
-                        <button class="btn btn-outline-danger btn-sm px-3 fw-semibold text-uppercase" id="authBtn">Login</button>
+                        <button class="btn btn-outline-danger btn-sm px-3 fw-semibold text-uppercase" id="authBtn" data-bs-toggle="modal" data-bs-target="#loginSignupModal">Login / Signup</button>
                     </li>
                 </ul>
             </div>
@@ -326,26 +327,15 @@
         </div>
     </div>
 
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark border border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title text-white text-uppercase tracking-wide">Admin Login</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="loginSignupModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-sm-down">
+            <div class="modal-content bg-transparent border-0 shadow-none">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="loginForm" class="modal-body text-white p-4">
-                    <div class="mb-3">
-                        <label for="loginEmail" class="form-label">Email</label>
-                        <input id="loginEmail" type="email" class="form-control login-input" placeholder="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="loginPassword" class="form-label">Password</label>
-                        <input id="loginPassword" type="password" class="form-control login-input" placeholder="password" required>
-                    </div>
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-warning" id="loginSubmitBtn">Sign In</button>
-                    </div>
-                </form>
+                <div class="modal-body p-0">
+                    <iframe src="userlogin.html" title="Login / Signup" class="w-100" style="min-height: 520px; height: 90vh; border: none; border-radius: .75rem; overflow: hidden; background: transparent;"></iframe>
+                </div>
             </div>
         </div>
     </div>

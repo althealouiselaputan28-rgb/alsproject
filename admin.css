@@ -1,0 +1,158 @@
+.admin-panel-card {
+    background: linear-gradient(135deg, rgba(20, 9, 20, 0.98), rgb(7, 2, 49));
+    border: 1px solid rgba(241, 179, 8, 0.973);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+}
+
+.admin-card-grid .admin-feature-card,
+.admin-summary-card {
+    background: rgba(10, 17, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-card-grid .admin-feature-card:hover,
+.admin-summary-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 193, 7, 0.24);
+}
+
+.admin-feature-card h3,
+.admin-summary-card h3 {
+    color: #ffffff;
+}
+
+.admin-summary-card p {
+    color: #adb5bd;
+}
+
+.admin-status-card {
+    background: rgba(5, 9, 20, 0.95);
+}
+
+#adminAuthStatus {
+    color: #ffc107;
+    font-weight: 700;
+}
+
+#adminUserEmailHolder {
+    color: #cbd5e1;
+}
+
+#adminUnauthMessage {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.25);
+    color: #f8f0d3;
+}
+
+.admin-unified-layout {
+    gap: 1.5rem;
+}
+
+.admin-sidebar {
+    width: 220px;
+    min-height: 320px;
+    background: linear-gradient(135deg, rgba(230, 224, 230, 0.98), rgb(95, 95, 99));
+    border: 1px solid rgba(241, 179, 8, 0.973);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    transition: width 0.25s ease;
+    flex-shrink: 0;
+}
+
+.admin-sidebar:hover {
+    width: 220px;
+}
+
+.admin-panel-main {
+    flex: 1;
+    min-height: 320px;
+    background: rgb(242, 245, 253);
+    border: 1px solid rgb(199, 136, 0);
+    border-radius: 1.25rem;
+    padding: 1rem;
+}
+
+.admin-panel-placeholder {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+}
+
+.sidebar-title {
+    color: #000000;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    padding: 1rem 0.9rem;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.admin-sidebar:hover .sidebar-title {
+    opacity: 1;
+}
+
+.sidebar-nav {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 0.95rem;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-item:hover,
+.sidebar-item.active {
+    background: rgba(255, 193, 7, 0.12);
+    color: #ffffff;
+}
+
+.sidebar-icon {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: url('adminimages/ucp.png') center center / 20px 20px no-repeat;
+}
+
+.sidebar-text {
+    opacity: 1;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}
+
+.admin-sidebar:hover .sidebar-text {
+    opacity: 1;
+}
+
+@media (max-width: 992px) {
+    .admin-sidebar {
+        width: 100%;
+    }
+    .admin-sidebar:hover {
+        width: 100%;
+    }
+    .sidebar-title,
+    .sidebar-text {
+        opacity: 1;
+    }
+    .sidebar-item {
+        justify-content: flex-start;
+    }
+    .hero-banner .hero-image-box {
+        justify-content: center !important;
+        margin-top: 1.5rem;
+    }
+}

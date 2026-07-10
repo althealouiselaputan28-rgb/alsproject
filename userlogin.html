@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Login</title>
+    <link rel="stylesheet" href="userlogin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box"></div>
+      <div class="container-forms">
+        <div class="container-info">
+          <div class="info-item">
+            <div class="table">
+              <div class="table-cell">
+                <p>Have an account?</p>
+                <div class="btn" data-mode="login">Login</div>
+              </div>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="table">
+              <div class="table-cell">
+                <p>Don't have an account?</p>
+                <div class="btn" data-mode="signup">Sign up</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container-form">
+          <form class="form-item log-in" autocomplete="off" novalidate>
+            <div class="table">
+              <div class="table-cell">
+                <input type="text" name="loginUsername" autocomplete="username" placeholder="Username or Email" />
+                <input type="password" name="loginPassword" autocomplete="current-password" placeholder="Password" />
+                <button type="button" class="btn" id="loginSubmitBtn">Log in</button>
+              </div>
+            </div>
+          </form>
+
+          <form class="form-item sign-up" autocomplete="off" novalidate>
+            <div class="table">
+              <div class="table-cell">
+                <input type="text" name="signupEmail" autocomplete="email" placeholder="Email" />
+                <input type="text" name="signupFullName" autocomplete="name" placeholder="Full Name" />
+                <input type="text" name="signupSection" autocomplete="section" placeholder="Section" />
+                <input type="password" name="signupPassword" autocomplete="new-password" placeholder="Password" />
+                <button type="button" class="btn" id="signupSubmitBtn">Sign up</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="userlogin.js"></script>
+  </body>
+</html>
+
