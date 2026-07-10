@@ -62,15 +62,6 @@ async function notifyParentAuthUpdate() {
   }
 }
 
-async function getUserEmailByUsername(supabase, username) {
-  const { data, error } = await supabase.from('users').select('email').eq('username', username).maybeSingle();
-  if (error) {
-    console.warn('Error looking up user by username', error);
-    return null;
-  }
-  return data?.email || null;
-}
-
 async function createUserProfileRow(supabase, profile) {
   if (!profile?.id) return false;
 
@@ -106,14 +97,9 @@ async function ensureUserProfileExists(supabase, authUser) {
       id: authUser.id,
       email: authUser.email || metadata.email || null,
       full_name: metadata.full_name || metadata.name || '',
-      username: metadata.username || '',
       section: metadata.section || '',
       role: metadata.role || DEFAULT_USER_ROLE
     };
-
-    if (!profile.username && profile.email) {
-      profile.username = profile.email.split('@')[0];
-    }
 
     const { error: insertError } = await supabase.from('users').insert([profile]);
     if (insertError) {
@@ -129,27 +115,17 @@ async function ensureUserProfileExists(supabase, authUser) {
 }
 
 async function signInWithIdentifier(supabase, identifier, password) {
-  const isEmail = identifier.includes('@');
-  if (isEmail) {
-    return supabase.auth.signInWithPassword({ email: identifier, password });
-  }
-
-  const email = await getUserEmailByUsername(supabase, identifier);
-  if (!email) {
-    return { data: null, error: { message: 'No account found with that username or email.' } };
-  }
-
-  return supabase.auth.signInWithPassword({ email, password });
+  return supabase.auth.signInWithPassword({ email: identifier, password });
 }
 
 async function handleLogin(supabase) {
-  const identifierInput = document.getElementById('loginUsername');
+  const emailInput = document.getElementById('loginEmail');
   const passwordInput = document.getElementById('loginPassword');
-  const identifier = identifierInput?.value.trim() || '';
+  const email = emailInput?.value.trim() || '';
   const password = passwordInput?.value || '';
 
-  if (!identifier || !password) {
-    showMessage('Please enter both username/email and password.');
+  if (!email || !password) {
+    showMessage('Please enter both email and password.');
     return;
   }
 
@@ -187,14 +163,14 @@ async function handleSignup(supabase) {
     return;
   }
 
-  const username = section.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-  if (!username) {
+  const sectionIdentifier = section.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  if (!sectionIdentifier) {
     showMessage('Section must contain letters or numbers.');
     return;
   }
 
-  const { data: existingUsername } = await supabase.from('users').select('id').eq('username', username).maybeSingle();
-  if (existingUsername) {
+  const { data: existingSection } = await supabase.from('users').select('id').eq('section', sectionIdentifier).maybeSingle();
+  if (existingSection) {
     showMessage('That section is already taken as a login identifier. Try a different section.');
     return;
   }
@@ -211,7 +187,6 @@ async function handleSignup(supabase) {
     options: {
       data: {
         full_name: fullName,
-        username,
         section,
         role: DEFAULT_USER_ROLE
       }
@@ -232,8 +207,7 @@ async function handleSignup(supabase) {
       id: authUser.id,
       email,
       full_name: fullName,
-      username,
-      section,
+      section: sectionIdentifier,
       role: DEFAULT_USER_ROLE
     });
   }
@@ -247,8 +221,7 @@ async function handleSignup(supabase) {
           id: loggedInUser.id,
           email,
           full_name: fullName,
-          username,
-          section,
+          section: sectionIdentifier,
           role: DEFAULT_USER_ROLE
         });
       }
