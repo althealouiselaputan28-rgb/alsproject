@@ -70,6 +70,7 @@
     let editingRosterId = null;
     let editingRosterImageUrl = '';
     let editingRosterSection = '';
+    let editingRosterCourse = '';
 
     // DOM handles
     const authBtn = document.getElementById('authBtn');
@@ -84,19 +85,36 @@
     const authorIconUrl = new URL('./images/pen-nib-solid.png', import.meta.url).href;
 
     const SECTION_MARKER = '||SECTION:';
+    const COURSE_MARKER = '||COURSE:';
     function parseRosterSubtitle(rawSubtitle) {
         const subtitleValue = (rawSubtitle || '').toString();
-        if (!subtitleValue) return { label: '', section: '' };
+        if (!subtitleValue) return { label: '', section: '', course: '' };
+
+        let label = subtitleValue.trim();
+        let section = '';
+        let course = '';
+
         if (subtitleValue.includes(SECTION_MARKER)) {
-            const [labelValue, sectionValue] = subtitleValue.split(SECTION_MARKER);
-            return {
-                label: labelValue.trim(),
-                section: (sectionValue || '').trim().toLowerCase()
-            };
+            const [labelValue, remainderValue] = subtitleValue.split(SECTION_MARKER);
+            label = (labelValue || '').trim();
+            const remainder = (remainderValue || '').trim();
+            if (remainder.includes(COURSE_MARKER)) {
+                const [sectionValue, courseValue] = remainder.split(COURSE_MARKER);
+                section = (sectionValue || '').trim().toLowerCase();
+                course = (courseValue || '').trim();
+            } else {
+                section = remainder.toLowerCase();
+            }
+        } else if (subtitleValue.includes(COURSE_MARKER)) {
+            const [labelValue, courseValue] = subtitleValue.split(COURSE_MARKER);
+            label = (labelValue || '').trim();
+            course = (courseValue || '').trim();
         }
+
         return {
-            label: subtitleValue.trim(),
-            section: ''
+            label,
+            section: section.toLowerCase(),
+            course
         };
     }
     const pages = {
@@ -629,11 +647,14 @@ let thumbnail = null;
                         editingRosterId = item.id;
                         editingRosterImageUrl = item.image_url || '';
                         editingRosterSection = parsed.section || '';
+                        editingRosterCourse = parsed.course || '';
                         if (rosterSectionInput) rosterSectionInput.value = parsed.section || '';
                         const nameInput = document.getElementById('studentName');
                         const subtitleInput = document.getElementById('studentSubtitle');
+                        const courseInput = document.getElementById('studentCourseTrack');
                         if (nameInput) nameInput.value = item.name || '';
                         if (subtitleInput) subtitleInput.value = parsed.label || '';
+                        if (courseInput) courseInput.value = parsed.course || '';
                         const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
                         modal.show();
                     });
@@ -680,6 +701,12 @@ let thumbnail = null;
                         subtitleEl.textContent = displaySubtitle;
                         card.appendChild(subtitleEl);
                     }
+                    if (parsedSubtitle.course) {
+                        const courseEl = document.createElement('div');
+                        courseEl.className = 'text-secondary roster-subtitle';
+                        courseEl.textContent = parsedSubtitle.course;
+                        card.appendChild(courseEl);
+                    }
 
                     const targetSection = isCabrera ? rosterCabrera : rosterAlcala;
                     col.appendChild(card);
@@ -704,9 +731,11 @@ let thumbnail = null;
                 const section = button.dataset.section;
                 const nameInput = document.getElementById('studentName');
                 const subtitleInput = document.getElementById('studentSubtitle');
+                const courseInput = document.getElementById('studentCourseTrack');
                 if (rosterSectionInput) rosterSectionInput.value = section || '';
                 if (nameInput) nameInput.value = '';
                 if (subtitleInput) subtitleInput.value = section === 'cabrera' ? 'Section Cabrera' : 'Section Alcala';
+                if (courseInput) courseInput.value = '';
                 const modal = new bootstrap.Modal(document.getElementById('addStudentModal'));
                 modal.show();
             });
@@ -720,6 +749,8 @@ let thumbnail = null;
         if (addStudentBtn) {
             addStudentBtn.addEventListener('click', () => {
                 if (rosterSectionInput) rosterSectionInput.value = '';
+                const courseInput = document.getElementById('studentCourseTrack');
+                if (courseInput) courseInput.value = '';
             });
         }
         if (addStudentForm) {
@@ -732,10 +763,12 @@ let thumbnail = null;
 
                 const nameInput = document.getElementById('studentName');
                     const subtitleInput = document.getElementById('studentSubtitle');
+                    const courseInput = document.getElementById('studentCourseTrack');
                     const fileInput = document.getElementById('studentPhoto');
                     const file = fileInput.files[0];
                     const name = nameInput.value.trim();
                     const subtitle = subtitleInput.value.trim();
+                    const courseTrack = courseInput ? courseInput.value.trim() : '';
                 if (!name || (!file && !editingRosterId)) {
                     alert('Please provide a name and photo.');
                     return;
@@ -783,16 +816,22 @@ let thumbnail = null;
 
                     const rosterRow = { name, image_url: imageUrl, created_by: session.user.id };
                     const normalizedSubtitle = subtitle.toLowerCase() === 'none' ? '' : subtitle;
+                    let subtitleValue = '';
                     if (normalizedSubtitle) {
-                        rosterRow.subtitle = selectedSection
-                            ? `${normalizedSubtitle}${SECTION_MARKER}${selectedSection}`
-                            : normalizedSubtitle;
-                    } else if (selectedSection) {
-                        rosterRow.subtitle = `${SECTION_MARKER}${selectedSection}`;
-                    } else {
-                        rosterRow.subtitle = 'Section Alcala';
-                        rosterRow.subtitle += `${SECTION_MARKER}alcala`;
+                        subtitleValue = normalizedSubtitle;
                     }
+                    if (selectedSection) {
+                        subtitleValue = subtitleValue
+                            ? `${subtitleValue}${SECTION_MARKER}${selectedSection}`
+                            : `${SECTION_MARKER}${selectedSection}`;
+                    } else if (!subtitleValue) {
+                        subtitleValue = 'Section Alcala';
+                        subtitleValue += `${SECTION_MARKER}alcala`;
+                    }
+                    if (courseTrack) {
+                        subtitleValue += `${COURSE_MARKER}${courseTrack}`;
+                    }
+                    rosterRow.subtitle = subtitleValue;
                     let dbRes;
                     if (editingRosterId) {
                         dbRes = await supabase.from('roster').update(rosterRow).eq('id', editingRosterId);
@@ -805,6 +844,8 @@ let thumbnail = null;
 
                     // clear and close modal
                     nameInput.value = '';
+                    if (subtitleInput) subtitleInput.value = '';
+                    if (courseInput) courseInput.value = '';
                     if (fileInput) fileInput.value = '';
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
                     if (modal) modal.hide();
