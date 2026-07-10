@@ -153,7 +153,9 @@ async function handleSignup(supabase) {
   }
 
   const userId = data?.user?.id;
-  if (userId) {
+  const hasSession = !!data?.session;
+
+  if (userId && hasSession) {
     const { error: insertError } = await supabase.from('users').insert([
       {
         id: userId,
@@ -167,10 +169,12 @@ async function handleSignup(supabase) {
     if (insertError) {
       console.warn('Failed to insert profile row', insertError);
     }
+  } else if (userId && !hasSession) {
+    console.info('Signup created a user but no active session is available yet. Profile row creation is deferred until login.');
   }
 
-  showMessage('Sign up complete. Please verify your email if required, then log in.');
-  if (data?.session) {
+  showMessage('Sign up complete. You can now log in with your credentials.');
+  if (hasSession) {
     await notifyParentAuthUpdate();
     await closeParentLoginModal();
   }
