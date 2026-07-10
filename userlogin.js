@@ -218,9 +218,10 @@ async function handleSignup(supabase) {
   }
 
   const authUser = data?.user || data?.session?.user;
+  const hasSession = !!data?.session;
   let profileCreated = false;
 
-  if (authUser?.id) {
+  if (authUser?.id && hasSession) {
     profileCreated = await createUserProfileRow(supabase, {
       id: authUser.id,
       email,
@@ -233,35 +234,31 @@ async function handleSignup(supabase) {
 
   if (!profileCreated && authUser?.id) {
     const signInResult = await supabase.auth.signInWithPassword({ email, password });
-    if (signInResult.error) {
-      showMessage('Sign up complete. Please log in to finish setup.');
-      return;
-    }
-
-    const loggedInUser = signInResult.data?.user || signInResult.data?.session?.user;
-    if (loggedInUser?.id) {
-      profileCreated = await createUserProfileRow(supabase, {
-        id: loggedInUser.id,
-        email,
-        full_name: fullName,
-        username,
-        section,
-        role: DEFAULT_USER_ROLE
-      });
+    if (!signInResult.error) {
+      const loggedInUser = signInResult.data?.user || signInResult.data?.session?.user;
+      if (loggedInUser?.id) {
+        profileCreated = await createUserProfileRow(supabase, {
+          id: loggedInUser.id,
+          email,
+          full_name: fullName,
+          username,
+          section,
+          role: DEFAULT_USER_ROLE
+        });
+      }
     }
   }
 
   if (profileCreated) {
     showMessage('Sign up complete and profile saved. You are now ready to log in.');
-  } else {
-    showMessage('Sign up complete. Please log in to finish account setup.');
-  }
-
-  if (profileCreated) {
     await notifyParentAuthUpdate();
     await closeParentLoginModal();
+    return;
   }
+
+  showMessage('Sign up complete. Please log in to finish account setup.');
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.querySelector('.container');
