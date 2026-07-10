@@ -129,7 +129,7 @@ async function handleLogin(supabase) {
     return;
   }
 
-  const { data, error } = await signInWithIdentifier(supabase, identifier, password);
+  const { data, error } = await signInWithIdentifier(supabase, email, password);
   if (error) {
     showMessage(`Login failed: ${error.message}`);
     return;
