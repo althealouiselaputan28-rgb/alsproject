@@ -34,8 +34,8 @@
           <form class="form-item log-in" autocomplete="off" novalidate>
             <div class="table">
               <div class="table-cell">
-                <input type="text" name="loginUsername" autocomplete="username" placeholder="Username or Email" />
-                <input type="password" name="loginPassword" autocomplete="current-password" placeholder="Password" />
+                <input type="text" id="loginUsername" name="loginUsername" autocomplete="username" placeholder="Username or Email" required />
+                <input type="password" id="loginPassword" name="loginPassword" autocomplete="current-password" placeholder="Password" required />
                 <button type="button" class="btn" id="loginSubmitBtn">Log in</button>
               </div>
             </div>
@@ -44,10 +44,10 @@
           <form class="form-item sign-up" autocomplete="off" novalidate>
             <div class="table">
               <div class="table-cell">
-                <input type="text" name="signupEmail" autocomplete="email" placeholder="Email" />
-                <input type="text" name="signupFullName" autocomplete="name" placeholder="Full Name" />
-                <input type="text" name="signupSection" autocomplete="section" placeholder="Section" />
-                <input type="password" name="signupPassword" autocomplete="new-password" placeholder="Password" />
+                <input type="email" id="signupEmail" name="signupEmail" autocomplete="email" placeholder="Email" required />
+                <input type="text" id="signupFullName" name="signupFullName" autocomplete="name" placeholder="Full Name" required />
+                <input type="text" id="signupSection" name="signupSection" autocomplete="section" placeholder="Section" required />
+                <input type="password" id="signupPassword" name="signupPassword" autocomplete="new-password" placeholder="Password" required />
                 <button type="button" class="btn" id="signupSubmitBtn">Sign up</button>
               </div>
             </div>

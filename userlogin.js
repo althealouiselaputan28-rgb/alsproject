@@ -143,8 +143,10 @@ async function signInWithIdentifier(supabase, identifier, password) {
 }
 
 async function handleLogin(supabase) {
-  const identifier = document.querySelector('input[name="loginUsername"]').value.trim();
-  const password = document.querySelector('input[name="loginPassword"]').value;
+  const identifierInput = document.getElementById('loginUsername');
+  const passwordInput = document.getElementById('loginPassword');
+  const identifier = identifierInput?.value.trim() || '';
+  const password = passwordInput?.value || '';
 
   if (!identifier || !password) {
     showMessage('Please enter both username/email and password.');
@@ -171,10 +173,14 @@ async function handleLogin(supabase) {
 }
 
 async function handleSignup(supabase) {
-  const email = document.querySelector('input[name="signupEmail"]').value.trim();
-  const fullName = document.querySelector('input[name="signupFullName"]').value.trim();
-  const section = document.querySelector('input[name="signupSection"]').value.trim();
-  const password = document.querySelector('input[name="signupPassword"]').value;
+  const emailInput = document.getElementById('signupEmail');
+  const fullNameInput = document.getElementById('signupFullName');
+  const sectionInput = document.getElementById('signupSection');
+  const passwordInput = document.getElementById('signupPassword');
+  const email = emailInput?.value.trim() || '';
+  const fullName = fullNameInput?.value.trim() || '';
+  const section = sectionInput?.value.trim() || '';
+  const password = passwordInput?.value || '';
 
   if (!email || !fullName || !section || !password) {
     showMessage('Please fill out every signup field.');
