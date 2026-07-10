@@ -1,22 +1,34 @@
 const DEFAULT_USER_ROLE = 'user';
 
 function getSupabaseClient() {
-  if (window.parent && window.parent.supabase && typeof window.parent.supabase.auth !== 'undefined') {
-    return window.parent.supabase;
+  const parent = window.parent || window;
+  const parentSupabase = parent.supabase || parent.supabaseClient || parent.supabaseInstance || parent.$supabase;
+  if (parentSupabase && parentSupabase.auth) {
+    return parentSupabase;
   }
 
-  if (window.parent && window.parent.$supabase) {
-    return window.parent.$supabase;
-  }
-
-  const parentUrl = window.parent?.SUPABASE_URL || window.parent?.VITE_SUPABASE_URL;
-  const parentKey = window.parent?.SUPABASE_ANON_KEY || window.parent?.VITE_SUPABASE_ANON_KEY;
+  const parentUrl = parent.SUPABASE_URL || parent.VITE_SUPABASE_URL;
+  const parentKey = parent.SUPABASE_ANON_KEY || parent.VITE_SUPABASE_ANON_KEY;
 
   if (window.supabase && typeof window.supabase.createClient === 'function' && parentUrl && parentKey) {
     return window.supabase.createClient(parentUrl, parentKey);
   }
 
   return null;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForSupabaseClient(timeoutMs = 2000, intervalMs = 100) {
+  const start = Date.now();
+  let client = getSupabaseClient();
+  while (!client && Date.now() - start < timeoutMs) {
+    await sleep(intervalMs);
+    client = getSupabaseClient();
+  }
+  return client;
 }
 
 function showMessage(message) {
@@ -188,22 +200,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   if (loginButton) {
-    loginButton.addEventListener('click', () => {
-      if (!supabase) {
+    loginButton.addEventListener('click', async () => {
+      const client = await waitForSupabaseClient();
+      if (!client) {
         showMessage('Supabase is not configured for this login modal.');
         return;
       }
-      handleLogin(supabase);
+      await handleLogin(client);
     });
   }
 
   if (signupButton) {
-    signupButton.addEventListener('click', () => {
-      if (!supabase) {
+    signupButton.addEventListener('click', async () => {
+      const client = await waitForSupabaseClient();
+      if (!client) {
         showMessage('Supabase is not configured for this login modal.');
         return;
       }
-      handleSignup(supabase);
+      await handleSignup(client);
     });
   }
 });

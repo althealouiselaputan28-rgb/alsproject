@@ -40,9 +40,9 @@
         window.supabaseClient = supabase;
         window.supabaseInstance = supabase;
         window.$supabase = supabase;
-        if (window.supabase && typeof window.supabase.createClient === 'function') {
-            window.supabase = supabase;
-        }
+        window.supabase = supabase;
+        window.SUPABASE_URL = SUPABASE_URL;
+        window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
         console.log('Use supabaseClient.auth.getSession() or supabase.auth.getSession() if available.');
     }
     console.groupEnd();
@@ -138,11 +138,7 @@
 
     // safe modal init
     let bootstrapModal = null;
-    let loginBootstrapModal = null;
-    const loginForm = document.getElementById('loginForm');
-    const loginEmailInput = document.getElementById('loginEmail');
-    const loginPasswordInput = document.getElementById('loginPassword');
-    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    let loginSignupModal = null;
     const rosterSectionInput = document.getElementById('rosterSection');
     const viewArticleTitle = document.getElementById('viewArticleTitle');
     const viewArticleDate = document.getElementById('viewArticleDate');
@@ -159,9 +155,9 @@
         console.warn('Bootstrap modal not available.', e);
     }
     try {
-        loginBootstrapModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        loginSignupModal = new bootstrap.Modal(document.getElementById('loginSignupModal'));
     } catch (e) {
-        console.warn('Login modal not available.', e);
+        console.warn('Login signup modal not available.', e);
     }
 
     let viewArticleBootstrapModal = null;
@@ -262,7 +258,9 @@
 
     // Auth button behavior (guarded)
     if (authBtn) {
-        authBtn.addEventListener('click', async () => {
+        authBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+
             if (!supabase) {
                 alert('Authentication is unavailable on this static server.');
                 return;
@@ -280,57 +278,12 @@
                 return;
             }
 
-            if (loginBootstrapModal) {
-                loginBootstrapModal.show();
+            if (loginSignupModal) {
+                loginSignupModal.show();
             }
         });
     }
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (!supabase) {
-                alert('Authentication is unavailable on this static server.');
-                return;
-            }
-
-            const email = loginEmailInput?.value.trim();
-            const password = loginPasswordInput?.value;
-            if (!email || !password) {
-                alert('Please enter both email and password.');
-                return;
-            }
-
-            if (loginSubmitBtn) {
-                loginSubmitBtn.disabled = true;
-                loginSubmitBtn.textContent = 'Signing In...';
-            }
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            console.log('SignIn response', data, error);
-
-            if (error) {
-                alert(`Access Rejected: ${error.message}`);
-                if (loginSubmitBtn) {
-                    loginSubmitBtn.disabled = false;
-                    loginSubmitBtn.textContent = 'Sign In';
-                }
-                return;
-            }
-
-            await checkSessionState();
-            updateAuthUI();
-            if (loginBootstrapModal) {
-                loginBootstrapModal.hide();
-            }
-            if (loginEmailInput) loginEmailInput.value = '';
-            if (loginPasswordInput) loginPasswordInput.value = '';
-            if (loginSubmitBtn) {
-                loginSubmitBtn.disabled = false;
-                loginSubmitBtn.textContent = 'Sign In';
-            }
-        });
-    }
 
     // Ensure create post clears edit state before showing modal
     if (createPostBtn) {
