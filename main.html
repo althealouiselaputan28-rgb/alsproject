@@ -42,14 +42,14 @@
         <div class="row align-items-center flex-nowrap">
         
             <!-- Changed from col-md-8 to col-7 or col-8 -->
-            <div class="col-8">
+            <div class="col-md-8">
                 <h1 class="display-4 fw-black text-white text-uppercase tracking-tight mb-0">TAGUM NATIONAL</h1>
                 <h1 class="display-4 fw-black text-warning text-uppercase tracking-tight mb-3">TRADE SCHOOL</h1>
                 <p class="text-secondary fs-5 tracking-wide">Grade 12 Cabrera and Alcala</p>
             </div>
         
             <!-- Changed from col-md-4 to col-4, changed center to end to push logos to the right -->
-            <div class="col-4 d-flex justify-content-end">
+            <div class="col-md4 d-flex justify-content-end">
                 <div class="hero-image-box d-flex align-items-center justify-content-center p-2 rounded">
                     <img src="images/alslogo.png" alt="ALS logo" class="hero-box-logo img-fluid me-2" style="max-height: 50px;">
                     <img src="images/tntslogo.png" alt="TNTS logo" class="hero-box-logo img-fluid" style="max-height: 50px;">
@@ -100,14 +100,50 @@
         <section id="informationPage" class="page-section">
             <div class="row">
                 <div class="col-12">
-                    <div class="card custom-card border-danger-subtle p-4">
-                        <h2 class="text-white text-uppercase tracking-wide fw-bold mb-3">Information</h2>
-                        <p class="text-secondary">This page contains details about the Alternative Learning System, campus updates, and school news.</p>
-                        <ul class="list-group list-group-flush bg-transparent">
-                            <li class="list-group-item bg-transparent border-secondary text-white">Mission: Provide quality alternative education for all students.</li>
-                            <li class="list-group-item bg-transparent border-secondary text-white">Vision: Empower learners with skills for life and career success.</li>
-                            <li class="list-group-item bg-transparent border-secondary text-white">Departments: Academic, Technical-Vocational, Guidance, and Student Services.</li>
-                        </ul>
+                    <div class="card custom-card border-danger-subtle p-4 p-md-5">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+                            <div>
+                                <p class="text-warning text-uppercase small-meta mb-2">ALS Information Hub</p>
+                                <h2 class="text-black text-uppercase tracking-wide fw-bold mb-1">Information</h2>
+                                <p class="text-secondary mb-0">Explore the latest school updates, learning resources, and college pathways in one place.</p>
+                            </div>
+                            <a href="main.html#home" class="btn btn-outline-warning btn-sm fw-semibold">Back to Home</a>
+                        </div>
+
+                        <hr class="border-warning border-2 opacity-100 mb-4">
+
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                            <div class="col">
+                                <div class="card h-100 info-page-card border-secondary-subtle">
+                                    <div class="card-body p-4 d-flex flex-column align-items-center text-center">
+                                        <img src="images/calendar.png" alt="Event Calendar" class="info-card-image mb-3" />
+                                        <h3 class="h5 text-white mt-3 mb-2">Event Calendar</h3>
+                                        <p class="text-secondary flex-grow-1">Stay updated on school events, important dates, and campus activities.</p>
+                                        <a href="event-calendar.html" class="btn btn-warning mt-3">Open Event Calendar</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card h-100 info-page-card border-secondary-subtle">
+                                    <div class="card-body p-4 d-flex flex-column align-items-center text-center">
+                                        <img src="images/books.png" alt="Resources" class="info-card-image mb-3" />
+                                        <h3 class="h5 text-white mt-3 mb-2">Resources</h3>
+                                        <p class="text-secondary flex-grow-1">Find study tools, guidance materials, and useful references for learners.</p>
+                                        <a href="resources.html" class="btn btn-warning mt-3">View Resources</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card h-100 info-page-card border-secondary-subtle">
+                                    <div class="card-body p-4 d-flex flex-column align-items-center text-center">
+                                        <img src="images/admission.png" alt="College Admission Hub" class="info-card-image mb-3" />
+                                        <h3 class="h5 text-white mt-3 mb-2">College Admission Hub</h3>
+                                        <p class="text-secondary flex-grow-1">Browse admission essentials and prepare for your next academic step.</p>
+                                        <a href="college-admission-hub.html" class="btn btn-warning mt-3">Explore Admissions</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

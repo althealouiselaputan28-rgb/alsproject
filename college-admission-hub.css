@@ -1,0 +1,21 @@
+body {
+    background: linear-gradient(180deg, #040a16 0%, #0b1426 100%);
+    color: #f8fafc;
+    min-height: 100vh;
+}
+
+.hero-banner {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(29, 78, 216, 0.92));
+    border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.info-detail-card {
+    background: rgba(8, 14, 28, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.info-detail-card .list-group-item {
+    border-color: rgba(255, 255, 255, 0.08);
+}
