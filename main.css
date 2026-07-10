@@ -239,6 +239,7 @@ body {
 .extra-item { display: flex; flex-direction: column; align-items: center; }
 .extra-name { font-weight: 700; color: #ffffff; }
 .extra-role { font-style: italic; color: #adb5bd; font-size: 0.95rem; margin-top: 0.25rem; }
+.extra-course { font-style: italic; color: #adb5bd; font-size: 0.85rem; margin-top: 0.25rem; }
 
 .roster-card {
     min-height: 380px;
