@@ -71,6 +71,63 @@ async function getUserEmailByUsername(supabase, username) {
   return data?.email || null;
 }
 
+async function createUserProfileRow(supabase, profile) {
+  if (!profile?.id) return false;
+
+  try {
+    const { error } = await supabase.from('users').insert([profile]);
+    if (error) {
+      console.warn('Failed to create user profile row', error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.warn('Unexpected error creating user profile row', error);
+    return false;
+  }
+}
+
+async function ensureUserProfileExists(supabase, authUser) {
+  if (!authUser?.id) return false;
+
+  try {
+    const { data: existing, error: existingError } = await supabase.from('users').select('id').eq('id', authUser.id).maybeSingle();
+    if (existingError) {
+      console.warn('Error checking existing user profile', existingError);
+      return false;
+    }
+
+    if (existing) {
+      return true;
+    }
+
+    const metadata = authUser.user_metadata || {};
+    const profile = {
+      id: authUser.id,
+      email: authUser.email || metadata.email || null,
+      full_name: metadata.full_name || metadata.name || '',
+      username: metadata.username || '',
+      section: metadata.section || '',
+      role: metadata.role || DEFAULT_USER_ROLE
+    };
+
+    if (!profile.username && profile.email) {
+      profile.username = profile.email.split('@')[0];
+    }
+
+    const { error: insertError } = await supabase.from('users').insert([profile]);
+    if (insertError) {
+      console.warn('Failed to insert profile row', insertError);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.warn('Error ensuring user profile exists', error);
+    return false;
+  }
+}
+
 async function signInWithIdentifier(supabase, identifier, password) {
   const isEmail = identifier.includes('@');
   if (isEmail) {
@@ -98,6 +155,14 @@ async function handleLogin(supabase) {
   if (error) {
     showMessage(`Login failed: ${error.message}`);
     return;
+  }
+
+  const authUser = data?.user || data?.session?.user;
+  if (authUser) {
+    const created = await ensureUserProfileExists(supabase, authUser);
+    if (!created) {
+      console.warn('User profile creation or verification failed after login.');
+    }
   }
 
   showMessage('Login successful.');
@@ -152,29 +217,47 @@ async function handleSignup(supabase) {
     return;
   }
 
-  const userId = data?.user?.id;
-  const hasSession = !!data?.session;
+  const authUser = data?.user || data?.session?.user;
+  let profileCreated = false;
 
-  if (userId && hasSession) {
-    const { error: insertError } = await supabase.from('users').insert([
-      {
-        id: userId,
+  if (authUser?.id) {
+    profileCreated = await createUserProfileRow(supabase, {
+      id: authUser.id,
+      email,
+      full_name: fullName,
+      username,
+      section,
+      role: DEFAULT_USER_ROLE
+    });
+  }
+
+  if (!profileCreated && authUser?.id) {
+    const signInResult = await supabase.auth.signInWithPassword({ email, password });
+    if (signInResult.error) {
+      showMessage('Sign up complete. Please log in to finish setup.');
+      return;
+    }
+
+    const loggedInUser = signInResult.data?.user || signInResult.data?.session?.user;
+    if (loggedInUser?.id) {
+      profileCreated = await createUserProfileRow(supabase, {
+        id: loggedInUser.id,
         email,
         full_name: fullName,
         username,
         section,
         role: DEFAULT_USER_ROLE
-      }
-    ]);
-    if (insertError) {
-      console.warn('Failed to insert profile row', insertError);
+      });
     }
-  } else if (userId && !hasSession) {
-    console.info('Signup created a user but no active session is available yet. Profile row creation is deferred until login.');
   }
 
-  showMessage('Sign up complete. You can now log in with your credentials.');
-  if (hasSession) {
+  if (profileCreated) {
+    showMessage('Sign up complete and profile saved. You are now ready to log in.');
+  } else {
+    showMessage('Sign up complete. Please log in to finish account setup.');
+  }
+
+  if (profileCreated) {
     await notifyParentAuthUpdate();
     await closeParentLoginModal();
   }
