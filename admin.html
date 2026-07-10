@@ -81,8 +81,55 @@
                     </ul>
                 </aside>
                 <main class="admin-panel-main">
-                    <div class="admin-panel-placeholder">
-                        <p class="mb-0">Select a sidebar option to display content here.</p>
+                    <div class="admin-user-panel">
+                        <div class="row g-4">
+                            <div class="col-lg-4">
+                                <div class="card bg-dark border-secondary-subtle h-100">
+                                    <div class="card-header bg-secondary border-secondary-subtle">
+                                        <h2 class="h6 mb-0 text-white">Existing Users</h2>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div id="adminUsersLoading" class="p-4 text-secondary">Loading users...</div>
+                                        <div id="adminUserList" class="list-group list-group-flush"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="card bg-dark border-secondary-subtle h-100" id="adminUserPanel">
+                                    <div class="card-header bg-secondary border-secondary-subtle">
+                                        <h2 class="h6 mb-0 text-white">User Control Panel</h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="adminUserForm">
+                                            <div class="mb-3">
+                                                <label for="adminUserName" class="form-label text-secondary">Name</label>
+                                                <input type="text" id="adminUserName" class="form-control bg-secondary text-white border-0" placeholder="Full name">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="adminUserEmailInput" class="form-label text-secondary">Email</label>
+                                                <input type="email" id="adminUserEmailInput" class="form-control bg-secondary text-white border-0" placeholder="Email address">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="adminUserSection" class="form-label text-secondary">Section</label>
+                                                <input type="text" id="adminUserSection" class="form-control bg-secondary text-white border-0" placeholder="Section">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="adminUserRole" class="form-label text-secondary">Role</label>
+                                                <select id="adminUserRole" class="form-select bg-secondary text-white border-0">
+                                                    <option value="user">User</option>
+                                                    <option value="moderator">Moderator</option>
+                                                    <option value="admin">Admin</option>
+                                                </select>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div id="adminUserFormMessage" class="text-secondary small"></div>
+                                                <button type="button" id="adminUserSaveBtn" class="btn btn-warning">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
