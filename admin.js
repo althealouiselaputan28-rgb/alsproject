@@ -18,6 +18,8 @@ const adminUserEmailInput = document.getElementById('adminUserEmailInput');
 const adminUserSection = document.getElementById('adminUserSection');
 const adminUserRole = document.getElementById('adminUserRole');
 const adminUserSaveBtn = document.getElementById('adminUserSaveBtn');
+const adminUserCreateBtn = document.getElementById('adminUserCreateBtn');
+const adminUserNewBtn = document.getElementById('adminUserNewBtn');
 const adminUserFormMessage = document.getElementById('adminUserFormMessage');
 
 let adminSelectedUserId = null;
@@ -118,9 +120,65 @@ function selectAdminUser(user) {
     }
 }
 
+function resetAdminUserForm() {
+    adminSelectedUserId = null;
+    if (adminUserName) adminUserName.value = '';
+    if (adminUserEmailInput) adminUserEmailInput.value = '';
+    if (adminUserSection) adminUserSection.value = '';
+    if (adminUserRole) adminUserRole.value = 'user';
+    if (adminUserFormMessage) adminUserFormMessage.textContent = 'Fill the form and click Create User to add a new account.';
+}
+
+async function createAdminUser() {
+    if (!ADMIN_SUPABASE || !adminUserFormMessage) return;
+
+    const newUser = {
+        full_name: adminUserName?.value.trim() || null,
+        email: adminUserEmailInput?.value.trim() || null,
+        section: adminUserSection?.value.trim() || null,
+        role: adminUserRole?.value || 'user'
+    };
+
+    if (!newUser.full_name || !newUser.email || !newUser.section) {
+        adminUserFormMessage.textContent = 'Name, email, and section are required to create a user.';
+        return;
+    }
+
+    adminUserSaveBtn.disabled = true;
+    if (adminUserCreateBtn) adminUserCreateBtn.disabled = true;
+    adminUserFormMessage.textContent = 'Creating user...';
+
+    try {
+        const { data, error } = await ADMIN_SUPABASE.from('users').insert([newUser]);
+        if (error) {
+            console.error('Failed to create user', error);
+            adminUserFormMessage.textContent = `Create failed: ${error.message}`;
+            return;
+        }
+
+        adminUserFormMessage.textContent = 'User created successfully.';
+        await loadExistingUsers();
+        if (data && data.length > 0) {
+            selectAdminUser(data[0]);
+        } else {
+            resetAdminUserForm();
+        }
+    } catch (error) {
+        console.error('Error creating user', error);
+        adminUserFormMessage.textContent = 'Create failed. See console.';
+    } finally {
+        if (adminUserSaveBtn) adminUserSaveBtn.disabled = false;
+        if (adminUserCreateBtn) adminUserCreateBtn.disabled = false;
+    }
+}
+
 async function saveAdminUser() {
-    if (!ADMIN_SUPABASE || !adminSelectedUserId) return;
+    if (!ADMIN_SUPABASE) return;
     if (!adminUserFormMessage) return;
+    if (!adminSelectedUserId) {
+        await createAdminUser();
+        return;
+    }
 
     const updatedUser = {
         full_name: adminUserName?.value.trim() || null,
@@ -160,6 +218,14 @@ if (adminSignOutBtn) {
 
 if (adminUserSaveBtn) {
     adminUserSaveBtn.addEventListener('click', saveAdminUser);
+}
+
+if (adminUserCreateBtn) {
+    adminUserCreateBtn.addEventListener('click', createAdminUser);
+}
+
+if (adminUserNewBtn) {
+    adminUserNewBtn.addEventListener('click', resetAdminUserForm);
 }
 
 checkAdminSession();
