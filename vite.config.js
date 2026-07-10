@@ -9,6 +9,7 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'index.html'),
         main: resolve(__dirname, 'main.html'),
+        admin: resolve(__dirname, 'admin.html'),
         eventCalendar: resolve(__dirname, 'event-calendar.html'),
         resources: resolve(__dirname, 'resources.html'),
         collegeAdmissionHub: resolve(__dirname, 'college-admission-hub.html'),
