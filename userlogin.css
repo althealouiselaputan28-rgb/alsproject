@@ -163,6 +163,9 @@ body {
 
 .container .container-form .btn {
   position: relative;
+  justify-content: center;
+  display: flex;
+  align-items: center;  
   background: linear-gradient(135deg, rgba(253, 187, 6, 0.98), rgb(7, 2, 49));
   box-shadow: 0 0 10px 1px #ff73b3;
   margin-top: 30px;
